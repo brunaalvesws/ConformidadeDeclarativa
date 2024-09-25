@@ -1,0 +1,9 @@
+activity Manutencao de Funcionalidade
+bind Manutencao de Funcionalidade: nr_responsavel_anonimizado
+activity Construcao de Funcionalidade
+activity Documentacao de requisitos funcionais
+activity Atualizacao de requisitos funcionais
+nr_responsavel_anonimizado: integer between 0 and 999999
+Co-Existence[Atualizacao de requisitos funcionais, Manutencao de Funcionalidade] | | |
+Precedence[Atualizacao de requisitos funcionais, Manutencao de Funcionalidade] | | |
+Response[Atualizacao de requisitos funcionais, Manutencao de Funcionalidade] | | |

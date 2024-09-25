@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+python-dotenv
+pytest
+gunicorn
+flasgger
+pm4py
+Declare4Py
+flask_cors

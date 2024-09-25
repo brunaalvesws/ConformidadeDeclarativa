@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    command: gunicorn --bind 0.0.0.0:5000 wsgi:app
+    volumes:
+      - .:/app
+      - type: bind
+        source: "C:/Users/bruni/OneDrive/Documentos/Mestrado/Projeto"
+        target: /app/data
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production

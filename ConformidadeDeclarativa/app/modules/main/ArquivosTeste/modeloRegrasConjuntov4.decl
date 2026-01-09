@@ -1,0 +1,87 @@
+activity Manutencao de funcionalidade begin
+activity Manutencao de funcionalidade complete
+activity Atualizacao de requisitos funcionais begin
+activity Atualizacao de requisitos funcionais complete
+activity Construcao de funcionalidade begin
+activity Construcao de funcionalidade complete
+activity Documentacao de requisitos funcionais begin
+activity Documentacao de requisitos funcionais complete
+activity Contagem de ponto de funcao begin
+activity Contagem de ponto de funcao complete
+activity Gestao da demanda begin
+activity Gestao da demanda complete
+activity Planejamento de entrega begin
+activity Planejamento de entrega complete
+activity Review da entrega begin
+activity Review da entrega complete
+activity Publicar solucao begin
+activity Publicar solucao complete
+activity Elaborar caso de teste begin
+activity Elaborar caso de teste complete
+activity Executar teste begin
+activity Executar teste complete
+activity Corrigir erro begin
+activity Corrigir erro complete
+activity Gestao u
+activity Codigo u
+activity Requisito u
+activity Codigo c
+activity Requisito c
+activity PF c
+activity Teste c
+Precedence[Manutencao de funcionalidade begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Manutencao de funcionalidade complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Manutencao de funcionalidade begin, Codigo u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Codigo u, Manutencao de funcionalidade complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Atualizacao de requisitos funcionais begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Atualizacao de requisitos funcionais complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Atualizacao de requisitos funcionais begin, Requisito u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Requisito u, Atualizacao de requisitos funcionais complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Construcao de funcionalidade begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Construcao de funcionalidade complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Construcao de funcionalidade begin, Codigo c] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Codigo c, Construcao de funcionalidade complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Documentacao de requisitos funcionais begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Documentacao de requisitos funcionais complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Documentacao de requisitos funcionais begin, Requisito c] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Requisito c, Documentacao de requisitos funcionais complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Contagem de ponto de funcao begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Contagem de ponto de funcao complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Contagem de ponto de funcao begin, PF c] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[PF c, Contagem de ponto de funcao complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Gestao da demanda begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Gestao da demanda complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Planejamento de entrega begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Planejamento de entrega complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Review da entrega begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Review da entrega complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Publicar solucao begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Publicar solucao complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Elaborar caso de teste begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Elaborar caso de teste complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Elaborar caso de teste begin, Teste c] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Teste c, Elaborar caso de teste complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Executar teste begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Executar teste complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Corrigir erro begin, Gestao u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Gestao u, Corrigir erro complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Precedence[Corrigir erro begin, Codigo u] | A.concept:resource is re7 | T.concept:resource is re7 |
+Response[Codigo u, Corrigir erro complete] | A.concept:resource is re7 | T.concept:resource is re7 |
+Existence1[Contagem de ponto de funcao begin] | |
+Existence1[Gestao da demanda begin] | |
+Existence1[Planejamento de entrega begin] | |
+Existence1[Review da entrega begin] | |
+Existence1[Publicar solucao begin] | |
+Response[Atualizacao de requisitos funcionais begin, Manutencao de funcionalidade begin] | | |
+Response[Documentacao de requisitos funcionais begin, Construcao de funcionalidade begin] | | |
+Response[Planejamento de entrega begin, Review da entrega begin] | | |
+Response[Construcao de funcionalidade begin, Publicar solucao begin] | | |
+Response[Manutencao de funcionalidade begin, Publicar solucao begin] | | |
+Existence1[Elaborar caso de teste begin] | |
+Existence1[Executar teste begin] | |
+Response[Elaborar caso de teste begin, Executar teste begin] | | |
+Response[Documentacao de requisitos funcionais begin, Elaborar caso de teste begin] | | |
+Response[Atualizacao de requisitos funcionais begin, Elaborar caso de teste begin] | | |
+Precedence[Corrigir erro begin, Executar teste begin] | | |
+Precedence[Documentacao de requisitos funcionais begin, Elaborar caso de teste begin] | | |
+Precedence[Atualizacao de requisitos funcionais begin, Elaborar caso de teste begin] | | |

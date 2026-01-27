@@ -1,6 +1,11 @@
 # Use the official image as a parent image
 FROM python:3.9-slim
 
+# Install git to use my Declare4Py fork
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
+
 # Set the working directory in the container
 WORKDIR /app
 

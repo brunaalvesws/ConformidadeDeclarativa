@@ -5,7 +5,7 @@ services:
     volumes:
       - .:/app
       - type: bind
-        source: "C:/Users/bruni/OneDrive/Documentos/Mestrado/Projeto"
+        source: "C:/Users/bruni/OneDrive/Documentos/MestradoDocs/Projeto"
         target: /app/data
     ports:
       - "5000:5000"

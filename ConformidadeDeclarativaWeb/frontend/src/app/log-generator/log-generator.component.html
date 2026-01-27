@@ -1,0 +1,196 @@
+<div class="container">
+  <div class="log-generator-card">
+    <!-- Header -->
+    <div class="card-header">
+      <h2 class="card-title">Multi-perspective Conformance Checking</h2>
+      <p class="card-description">Upload your models and logs to be checked</p>
+    </div>
+    
+    <!-- Content -->
+    <div class="card-content">
+      <!-- Upload Models Section -->
+      <div class="section">
+        <h3 class="section-title">Upload Models</h3>
+        <p class="upload-label">You can find examples of the models to be uploaded in <a href="https://github.com/brunaalvesws/SMC2025-LogGenerator/tree/main/Examples"> GitHub</a> </p>
+        <br>
+        <div class="grid grid-cols-1 grid-cols-md-3">
+          <!-- DECLARE Model -->
+          <div class="upload-section">
+            <div class="button-label">
+              <label for="declare-model" class="upload-label">DECLARE model</label>
+              <span class="question-icon" data-tooltip="The DECLARE model must be a .decl file with activities and rules.">?</span>
+            </div>
+            <div class="upload-button-container">
+              <input
+                id="declare-model"
+                type="file"
+                class="hidden-input"
+                (change)="onDeclareFileSelected($event)"
+              />
+              <button 
+                (click)="onFileInputClick('declare-model')"
+                class="upload-button"
+              >
+                <div class="upload-button-content">
+                  <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span class="upload-text">Upload</span>
+                  <span class="upload-text">DECLARE model</span>
+                </div>
+              </button>
+            </div>
+            <div *ngIf="arquivoDeclare">
+              <label class="input-label">File chosen: {{ arquivoDeclare.name }}</label>
+            </div>
+          </div>
+
+          <!-- Access Restriction Model -->
+          <div class="upload-section">
+            <div class="button-label">
+              <label for="access-model" class="upload-label">Access Restriction model</label>
+              <span class="question-icon" data-tooltip="The access restriction model must be a .csv with the first column named 'Data Objects' filled with the data objects used, the other columns named after each activity filled with the valid operations for each data object. You can find an example in the project's GitHub">?</span>
+            </div>
+            <div class="upload-button-container">
+              <input
+                id="access-model"
+                type="file"
+                class="hidden-input"
+                (change)="onAccessFileSelected($event)"
+              />
+              <button 
+                (click)="onFileInputClick('access-model')"
+                class="upload-button"
+              >
+                <div class="upload-button-content">
+                  <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span class="upload-text">Upload</span>
+                  <span class="upload-text">Access Restriction model</span>
+                </div>
+              </button>
+            </div>
+            <div *ngIf="arquivoAcesso">
+              <label class="input-label">File chosen: {{ arquivoAcesso.name }}</label>
+          </div>
+          </div>
+          
+          <!-- Organizational Model -->
+          <div class="upload-section">
+            <div class="button-label">
+              <label for="org-model" class="upload-label">Organizational model</label>
+              <span class="question-icon" data-tooltip="The organizational model must be a .csv with the columns 'case:concept:name', 'concept:profile' and 'concept:resources', following the XES pattern. You can find an example in the project's GitHub.">?</span>
+            </div>
+            <div class="upload-button-container">
+              <input
+                id="org-model"
+                type="file"
+                class="hidden-input"
+                (change)="onResourceFileSelected($event)"
+              />
+              <button 
+                (click)="onFileInputClick('org-model')"
+                class="upload-button"
+              >
+                <div class="upload-button-content">
+                  <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span class="upload-text">Upload</span>
+                  <span class="upload-text">Organizational model</span>
+                </div>
+              </button>
+            </div>
+            <div *ngIf="arquivoOrganizacional">
+              <label class="input-label">File chosen: {{ arquivoOrganizacional.name }}</label>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      <!---Upload logs -->
+      <div class="grid grid-cols-2 grid-cols-md-3">
+      <div class="upload-section-logs">
+            <div class="button-label">
+              <label for="access-model" class="upload-label">Event Log</label>
+              <span class="question-icon" data-tooltip="The event log must be a .XES file">?</span>
+            </div>
+            <div class="upload-button-container">
+              <input
+                id="event-log"
+                type="file"
+                class="hidden-input"
+                (change)="onAccessFileSelected($event)"
+              />
+              <button 
+                (click)="onFileInputClick('event-log')"
+                class="upload-button"
+              >
+                <div class="upload-button-content">
+                  <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span class="upload-text">Upload</span>
+                  <span class="upload-text">Event Log</span>
+                </div>
+              </button>
+            </div>
+            <div *ngIf="arquivoAcesso">
+              <label class="input-label">File chosen: {{ arquivoAcesso.name }}</label>
+          </div>
+          </div>
+
+          <div class="upload-section-logs">
+            <div class="button-label">
+              <label for="access-model" class="upload-label">Data Access Log</label>
+              <span class="question-icon" data-tooltip="The Data Access log must be a .XES file">?</span>
+            </div>
+            <div class="upload-button-container">
+              <input
+                id="data-access-log"
+                type="file"
+                class="hidden-input"
+                (change)="onAccessFileSelected($event)"
+              />
+              <button 
+                (click)="onFileInputClick('data-access-log')"
+                class="upload-button"
+              >
+                <div class="upload-button-content">
+                  <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span class="upload-text">Upload</span>
+                  <span class="upload-text">Data Access Log</span>
+                </div>
+              </button>
+            </div>
+            <div *ngIf="arquivoAcesso">
+              <label class="input-label">File chosen: {{ arquivoAcesso.name }}</label>
+          </div>
+          </div>
+    </div>
+    <!-- Footer -->
+    <div class="card-footer">
+      <button class="generate-button" (click)="downloadCSV()">
+        Start 
+      </button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading" class="loading-overlay">
+  <div class="spinner"></div>
+  <p>Processing...</p>
+</div>

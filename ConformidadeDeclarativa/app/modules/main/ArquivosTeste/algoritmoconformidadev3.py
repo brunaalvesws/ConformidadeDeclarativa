@@ -58,12 +58,58 @@ Illegal data access: Any data log access performed by someone outside the team o
 Ignored mandatory data access: 2.1, 2.3, 2.5
 """
 
-import sys
-# sys.path.insert(0, r"C:/Users/bruni/Documents/MestradoDocs/Projeto/Declare4Py")
 import pandas as pd
 from Declare4Py.ProcessModels.DeclareModel import DeclareModel
 from Declare4Py.D4PyEventLog import D4PyEventLog
 import pm4py
+from pathlib import Path
+
+
+from xml.etree import ElementTree as ET
+from datetime import datetime
+import re
+from io import BytesIO
+
+
+from xml.etree import ElementTree as ET
+from datetime import datetime
+import re
+import tempfile
+import os
+
+
+def normalize_xes_timestamps_to_tempfile(xes_path: str) -> str:
+    tree = ET.parse(xes_path)
+    root = tree.getroot()
+
+    ns = {"xes": "http://www.xes-standard.org/"}
+
+    for date_elem in root.findall(".//xes:date", ns):
+        value = date_elem.attrib.get("value")
+        if not value:
+            continue
+
+        # remove timezone
+        value = re.sub(r"(Z|[+-]\d{2}:\d{2})$", "", value)
+
+        # remove fração de segundo
+        value = re.sub(r"\.\d+", "", value)
+
+        dt = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
+        date_elem.attrib["value"] = dt.strftime("%Y-%m-%dT%H:%M:%S")
+
+    tmp = tempfile.NamedTemporaryFile(
+        mode="wb",
+        suffix=".xes",
+        delete=False
+    )
+
+    tree.write(tmp, encoding="utf-8", xml_declaration=True)
+    tmp.close()
+
+    return tmp.name
+
+
 
 def check_letters(cell, model, access, activity):
     """Checks which letters (c, r, u, d) are present in the cell, distinguishing between uppercase and lowercase."""
@@ -111,15 +157,15 @@ def convert_model_to_rules(access_model, process_model):
     return declare_model
 
 def pre_process_data(process_log_path, access_log_path, model_log_path, process_model_path, access_model_path):
-    access_log = D4PyEventLog(case_name="case:concept:name")
-    access_log.parse_xes_log(access_log_path)
-    processed_access_log = pm4py.convert_to_dataframe(access_log.get_log())
-    processed_access_log = processed_access_log.sort_values(['case:concept:name', 'concept:instance'])
+    temp_xes_path = normalize_xes_timestamps_to_tempfile(access_log_path)
+    access_log = pm4py.read_xes(temp_xes_path)
+    processed_access_log = access_log.sort_values(['case:concept:name', 'concept:instance'])
     processed_process_model = pd.read_csv(model_log_path, sep=';')
     processed_access_model = pd.read_csv(access_model_path, sep=';')
     declare_model = DeclareModel().parse_from_file(process_model_path)
     event_log = D4PyEventLog(case_name="case:concept:name")
-    event_log.parse_xes_log(process_log_path)
+    temp_xes_path = normalize_xes_timestamps_to_tempfile(process_log_path)
+    event_log.parse_xes_log(temp_xes_path)
     allowed_activities = extract_allowed_activities(process_model_path)
     return event_log, processed_access_log, processed_process_model, declare_model, processed_access_model, allowed_activities
 
@@ -129,17 +175,17 @@ def convert_logs(process_log, access_log):
     '''
     Merges process and access logs into a single log format suitable for conformance checking with Declare4Py.
     '''
-    access_log_df = pm4py.convert_to_dataframe(process_log.get_log())
-    access_log_df = access_log_df.sort_values(['case:concept:name', 'concept:instance'])
-    for index, row in access_log_df.iterrows():
-        access_log_df.at[index, 'concept:name'] = row['concept:name'] + ' ' + row['lifecycle:transition']
-    access_log_df.drop('lifecycle:transition', axis=1, inplace=True)
+    process_log_df = pm4py.convert_to_dataframe(process_log.get_log())
+    process_log_df = process_log_df.sort_values(['case:concept:name', 'concept:instance'])
+    for index, row in process_log_df.iterrows():
+        process_log_df.at[index, 'concept:name'] = row['concept:name'] + ' ' + row['lifecycle:transition']
+    process_log_df.drop('lifecycle:transition', axis=1, inplace=True)
 
     for index, row in access_log.iterrows():
-        access_log_df.loc[len(access_log_df)] = [(row['concept:tool'] + ' ' + row['concept:operation'].lower()),row['time:timestamp'], row['concept:resource'], row['concept:instance'], len(access_log_df), row['@@case_index'], row['case:concept:name']]
-    access_log_df = access_log_df.sort_values(['case:concept:name', 'concept:instance','time:timestamp'])
-    access_log_df.to_csv('LogTesteConjunto.csv', index=False)
-    pm4py.write_xes(access_log_df, "LogSinteticoConjuntoOFICIAL.xes")
+        process_log_df.loc[len(process_log_df)] = [(row['concept:tool'] + ' ' + row['concept:operation'].lower()),row['time:timestamp'], row['concept:resource'], row['concept:instance'], len(process_log_df), row['@@case_index'], row['case:concept:name']]
+    process_log_df = process_log_df.sort_values(['case:concept:name', 'concept:instance','time:timestamp'])
+    process_log_df.to_csv('LogTesteConjunto.csv', index=False)
+    pm4py.write_xes(process_log_df, "LogSinteticoConjuntoOFICIAL.xes")
 
 def format_violations(df_violations):
     '''
@@ -191,8 +237,8 @@ def check_resource_conformance(process_log, access_log, resource_model):
 
     violations = {}
     violations["IllegalTeamAccess"] = []
-    violations["IllegalDataAccess"] = []
-    violations["IllegalActivity"] = []
+    violations["IllegalResourceAccess"] = []
+    violations["IllegalTeamActivity"] = []
 
     for index, row in resource_model.iterrows():
         case_id = row['case:concept:name']
@@ -203,7 +249,7 @@ def check_resource_conformance(process_log, access_log, resource_model):
         for i, activity in activities.iterrows():
             activity_resource = activity['concept:resource']
             if activity_resource not in resources:
-                violations["IllegalActivity"].append([activity['concept:name'], case_id, activity_resource, activity['concept:instance']])
+                violations["IllegalTeamActivity"].append([activity['concept:name'], case_id, activity_resource, activity['concept:instance']])
 
             activity_access = accesses[accesses['concept:instance']== activity['concept:instance']]
             for j, acc in activity_access.iterrows():
@@ -235,29 +281,23 @@ def check_activity_conformance(process_log, access_log, allowed_activities_set):
     '''
 
     process_log_df = pm4py.convert_to_dataframe(process_log.get_log())
-    processed_process_log = process_log_df[process_log_df["lifecycle:transition"] == "begin"]
+    processed_process_log = process_log_df[process_log_df["lifecycle:transition"] == "begin"].drop_duplicates(subset=['concept:name'])
+
 
     activity_conformance = {}
     activity_conformance["UnexpectedActivity"] = []
     activity_conformance["IllegalDataAccess"] = []
-    activity_conformance["IllegalTeamAccess"] = []
 
     for index, activity in processed_process_log.iterrows():
         activity_name = activity['concept:name']
         if activity_name not in allowed_activities_set:
             case_id = activity['case:concept:name']
             activity_resource = activity.get('concept:resource', 'MissingResource')
-            resources = activity['concept:resource'].split(", ")
             accesses = access_log[access_log['case:concept:name'] == case_id]
             activity_accesses = accesses[accesses['concept:instance'] == activity['concept:instance']]
-
+            activity_conformance['UnexpectedActivity'].append([activity_name, case_id, activity_resource])
             for j, acc in activity_accesses.iterrows():
-                activity_conformance['UnexpectedActivity'].append([acc['concept:tool'], case_id, acc['concept:resource'], activity_name])
-                if activity_resource != acc['concept:resource']:
-                    activity_conformance["IllegalDataAccess"].append([acc['concept:tool'], case_id, acc['concept:resource'], activity_resource, activity_name])
-                if acc['concept:resource'] not in resources:
-                    activity_conformance["IllegalTeamAccess"].append([acc['concept:tool'], case_id, acc['concept:resource'], activity_resource, activity_name])
-
+                activity_conformance['IllegalDataAccess'].append([acc['concept:tool'], case_id, acc['concept:resource'], activity_name])
 
 
     return activity_conformance
@@ -266,53 +306,66 @@ def format_inconformances(process_conformance, access_conformance, resource_conf
     '''
     Formats the non-conformances found in each check.
     '''
+    
+    report = ''
 
     print('Process Flow Violations:')
+    report += 'Process Flow Violations:\n'
     for violation in process_conformance:
+        report += violation + '\n'
         print(violation)
 
 
     print('Prohibited Activity Violations:')
+    report += 'Prohibited Activity Violations:\n'
     for key, violation in activity_conformance.items():
 
         if key == "UnexpectedActivity":
             for occur in violation:
-                print(f'Prohibited activity in activity {occur[3]} in trace {occur[1]}, access to {occur[0]} was performed by resource {occur[2]} during a prohibited activity.')
-        if key == "IllegalTeamAccess":
-            for occur in violation:
-                print(f'Prohibited activity in access to {occur[0]} in trace {occur[1]}, resource {occur[2]} is not part of the designated team to perform the demand.')
-
+                print(f'Unexpected activity {occur[0]} in trace {occur[1]} performed by resource {occur[2]}.')
+                report += f'Unexpected activity {occur[0]} in trace {occur[1]} performed by resource {occur[2]}.\n'
         if key == "IllegalDataAccess":
             for occur in violation:
-                print(f'Prohibited activity in access to {occur[0]} in trace {occur[1]}, resource {occur[2]} was not the designated one for the linked activity, but {occur[3]} was.')
+                print(f'Unexpected data access during unexpected activity "{occur[3]}" in access to {occur[0]} in trace {occur[1]} performed by resource {occur[2]}.')
+                report += f'Unexpected data access during unexpected activity "{occur[3]}" in access to {occur[0]} in trace {occur[1]} performed by resource {occur[2]}.\n'
 
 
     print('Access Flow Violations:')
+    report += 'Access Flow Violations:'
     for violation in access_conformance:
+        report += violation + '\n'
         print(violation)
 
 
     print('Privacy Violations:')
     for key, violation in resource_conformance.items():
-        if key == "IllegalActivity":
+        if key == "IllegalTeamActivity":
             for occur in violation:
                 print(f'Privacy Violation in activity {occur[0]} in trace {occur[1]} instance {occur[3]}, resource {occur[2]} is not part of the designated team to perform the demand')
+                report += f'Privacy Violation in activity {occur[0]} in trace {occur[1]} instance {occur[3]}, resource {occur[2]} is not part of the designated team to perform the demand\n'
 
         if key == "IllegalTeamAccess":
             for occur in violation:
                 print(f'Privacy Violation in access to {occur[0]} in trace {occur[1]} instance {occur[3]}, resource {occur[2]} is not part of the designated team to perform the demand')
+                report += f'Privacy Violation in access to {occur[0]} in trace {occur[1]} instance {occur[3]}, resource {occur[2]} is not part of the designated team to perform the demand\n'
 
-        if key == "IllegalDataAccess":
+        if key == "IllegalResourceAccess":
             for occur in violation:
                 print(f'Privacy Violation in access to {occur[0]} in trace {occur[1]} instance {occur[4]}, resource {occur[2]} was not the designated one for the linked activity, but {occur[3]} was')
+                report += f'Privacy Violation in access to {occur[0]} in trace {occur[1]} instance {occur[4]}, resource {occur[2]} was not the designated one for the linked activity, but {occur[3]} was\n'
 
+    return report
 
 def MultiperspectiveConformanceAlgorithm():
   '''
   The algorithm accepts: a process log, a data access log, a resource model, a process DECLARE model, and a data access model.
   '''
   
-  process_log, access_log, resource_model, process_model, access_model, allowed_activities = pre_process_data('./LogSinteticoProcessoOFICIALv4.xes', './LogSinteticoAcessoOFICIALv4.xes', './modelRecursosOFICIALv4.csv', './Modelo_Log_Sintetico_OFICIAL.decl', './ModeloAcessoOFICIAL.csv')
+  process_log, access_log, resource_model, process_model, access_model, allowed_activities = pre_process_data(str(Path(__file__).resolve().parent / 'LogSinteticoProcessoOFICIALv4.xes'), 
+                                                                                                              str(Path(__file__).resolve().parent / 'LogSinteticoAcessoOFICIALv4.xes'), 
+                                                                                                              str(Path(__file__).resolve().parent / 'ModeloRecursosOFICIALv4.csv'), 
+                                                                                                              str(Path(__file__).resolve().parent / 'Modelo_Log_Sintetico_OFICIAL.decl'), 
+                                                                                                              str(Path(__file__).resolve().parent / 'ModeloAcessoOFICIAL.csv'))
   processed_access_model = convert_model_to_rules(access_model, process_model)
   convert_logs(process_log, access_log)
   process_conformance = check_process_conformance(process_model, process_log)
@@ -320,5 +373,3 @@ def MultiperspectiveConformanceAlgorithm():
   resource_conformance = check_resource_conformance(process_log, access_log, resource_model)
   activity_conformance = check_activity_conformance(process_log, access_log, allowed_activities)
   return format_inconformances(process_conformance, access_conformance, resource_conformance, activity_conformance)
-
-MultiperspectiveConformanceAlgorithm()

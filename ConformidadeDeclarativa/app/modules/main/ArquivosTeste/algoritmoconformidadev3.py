@@ -195,7 +195,7 @@ def format_violations(df_violations):
     for index, row in df_violations.iterrows():
         for column in df_violations.columns:
             if row[column] != [] and row[column] != None:
-                violations.append(f"Trace {index} violated {column} at instances {','.join([str(n) for n in row[column]])}")
+                violations.append([index,column,set([str(n) for n in row[column]])])
     return violations
 
 from Declare4Py.ProcessMiningTasks.ConformanceChecking.MPDeclareAnalyzer import MPDeclareAnalyzer
@@ -254,9 +254,9 @@ def check_resource_conformance(process_log, access_log, resource_model):
             activity_access = accesses[accesses['concept:instance']== activity['concept:instance']]
             for j, acc in activity_access.iterrows():
                 if activity_resource != acc['concept:resource']:
-                    violations["IllegalResourceAccess"].append([acc['concept:tool'], case_id, acc['concept:resource'], activity_resource, acc['concept:instance']])
+                    violations["IllegalResourceAccess"].append([acc['concept:tool'], activity['concept:name'], case_id, acc['concept:resource'], activity_resource, acc['concept:instance']])
                 if acc['concept:resource'] not in resources:
-                    violations["IllegalTeamAccess"].append([acc['concept:tool'], case_id, acc['concept:resource'], acc['concept:instance']])
+                    violations["IllegalTeamAccess"].append([acc['concept:tool'], activity['concept:name'], case_id, acc['concept:resource'], acc['concept:instance']])
 
     return violations
 
@@ -286,76 +286,103 @@ def check_activity_conformance(process_log, access_log, allowed_activities_set):
 
     activity_conformance = {}
     activity_conformance["UnexpectedActivity"] = []
-    activity_conformance["IllegalDataAccess"] = []
+    activity_conformance["UnexpectedDataAccess"] = []
 
     for index, activity in processed_process_log.iterrows():
         activity_name = activity['concept:name']
         if activity_name not in allowed_activities_set:
             case_id = activity['case:concept:name']
+            instance = activity['concept:instance']
             activity_resource = activity.get('concept:resource', 'MissingResource')
             accesses = access_log[access_log['case:concept:name'] == case_id]
             activity_accesses = accesses[accesses['concept:instance'] == activity['concept:instance']]
-            activity_conformance['UnexpectedActivity'].append([activity_name, case_id, activity_resource])
+            activity_conformance['UnexpectedActivity'].append([activity_name, case_id, instance, activity_resource])
             for j, acc in activity_accesses.iterrows():
-                activity_conformance['IllegalDataAccess'].append([acc['concept:tool'], case_id, acc['concept:resource'], activity_name])
+                activity_conformance['UnexpectedDataAccess'].append([acc['concept:tool'], case_id, instance, acc['concept:resource'], activity_name])
 
 
     return activity_conformance
 
 def format_inconformances(process_conformance, access_conformance, resource_conformance, activity_conformance):
     '''
-    Formats the non-conformances found in each check.
+    Formats the non-conformances found in each check to print.
     '''
     
     report = ''
 
-    print('Process Flow Violations:')
     report += 'Process Flow Violations:\n'
     for violation in process_conformance:
-        report += violation + '\n'
-        print(violation)
+        report += f"Trace {violation[0]} violated {violation[1]} at instances {violation[2]}" + '\n'
 
-
-    print('Prohibited Activity Violations:')
     report += 'Prohibited Activity Violations:\n'
     for key, violation in activity_conformance.items():
 
         if key == "UnexpectedActivity":
             for occur in violation:
-                print(f'Unexpected activity {occur[0]} in trace {occur[1]} performed by resource {occur[2]}.')
-                report += f'Unexpected activity {occur[0]} in trace {occur[1]} performed by resource {occur[2]}.\n'
-        if key == "IllegalDataAccess":
+                report += f'Unexpected activity {occur[0]} in trace {occur[1]} instance {occur[2]} performed by resource {occur[3]}.\n'
+        if key == "UnexpectedDataAccess":
             for occur in violation:
-                print(f'Unexpected data access during unexpected activity "{occur[3]}" in access to {occur[0]} in trace {occur[1]} performed by resource {occur[2]}.')
-                report += f'Unexpected data access during unexpected activity "{occur[3]}" in access to {occur[0]} in trace {occur[1]} performed by resource {occur[2]}.\n'
+                report += f'Unexpected data access during unexpected activity "{occur[4]}" in access to {occur[0]} in trace {occur[1]} instance {occur[2]} performed by resource {occur[3]}.\n'
 
-
-    print('Access Flow Violations:')
     report += 'Access Flow Violations:'
     for violation in access_conformance:
-        report += violation + '\n'
-        print(violation)
-
-
-    print('Privacy Violations:')
+        report += f"Trace {violation[0]} violated {violation[1]} at instances {violation[2]}" + '\n'
+        
+    report += 'Privacy Violations:'
     for key, violation in resource_conformance.items():
         if key == "IllegalTeamActivity":
             for occur in violation:
-                print(f'Privacy Violation in activity {occur[0]} in trace {occur[1]} instance {occur[3]}, resource {occur[2]} is not part of the designated team to perform the demand')
                 report += f'Privacy Violation in activity {occur[0]} in trace {occur[1]} instance {occur[3]}, resource {occur[2]} is not part of the designated team to perform the demand\n'
 
         if key == "IllegalTeamAccess":
             for occur in violation:
-                print(f'Privacy Violation in access to {occur[0]} in trace {occur[1]} instance {occur[3]}, resource {occur[2]} is not part of the designated team to perform the demand')
-                report += f'Privacy Violation in access to {occur[0]} in trace {occur[1]} instance {occur[3]}, resource {occur[2]} is not part of the designated team to perform the demand\n'
+                report += f'Privacy Violation in access to {occur[0]} of activity {occur[1]} in trace {occur[2]} instance {occur[4]}, resource {occur[3]} is not part of the designated team to perform the demand\n'
 
         if key == "IllegalResourceAccess":
             for occur in violation:
-                print(f'Privacy Violation in access to {occur[0]} in trace {occur[1]} instance {occur[4]}, resource {occur[2]} was not the designated one for the linked activity, but {occur[3]} was')
-                report += f'Privacy Violation in access to {occur[0]} in trace {occur[1]} instance {occur[4]}, resource {occur[2]} was not the designated one for the linked activity, but {occur[3]} was\n'
+                report += f'Privacy Violation in access to {occur[0]} of activity {occur[1]} in trace {occur[2]} instance {occur[5]}, resource {occur[3]} was not the designated one for the linked activity, but {occur[4]} was\n'
 
     return report
 
+def non_conformance_patterns_mapping(process_violations, access_violations, resource_violations, unexpected_activities):
+    patterns = {}
+    patterns['Prohibited activity'] = [] #1.5, 2.5, 3.5, 4.5, 5.5, 6.5
+    patterns['Unexpected activity'] = [] #7.7
+    patterns['Illegal activity'] = [] #Any process log event performed by someone outside the designated team
+    patterns['Ignored mandatory activity'] = [] #2.2, 4.2, 6.2
+    patterns['Prohibited data access'] = [] #5.1, 5.3, 5.5
+    patterns['Unexpected data access'] = [] #7.7
+    patterns['Illegal data access'] = [] #Any data log access performed by someone outside the team or not assigned to the corresponding activity
+    patterns['Ignored mandatory data access'] = [] #2.1, 2.3, 2.5
+    
+    for act in unexpected_activities['UnexpectedActivity']:
+        patterns['Unexpected activity'].append({'name': act[0], 'case_id': act[1], 'instance': act[2], 'resource': act[3]})
+        
+    for acc in unexpected_activities['UnexpectedDataAccess']:
+        patterns['Unexpected data access'].append({'tool': acc[0], 'case_id': acc[1], 'instance': acc[2], 'resource': acc[3], 'activity': acc[4]})
+        
+    for act in resource_violations['IllegalTeamActivity']:
+        patterns['Illegal activity'].append({'name': act[0], 'case_id': act[1], 'resource': act[2], 'instance': act[3]})
+        
+    for acc in unexpected_activities['IllegalTeamAccess']:
+        patterns['Illegal data access'].append({'tool': acc[0], 'activity': acc[1], 'case_id': acc[2], 'instance': acc[4], 'resource': acc[3]})
+    
+    for acc in unexpected_activities['IllegalResourceAccess']:
+        patterns['Illegal data access'].append({'tool': acc[0], 'activity': acc[1], 'case_id': acc[2], 'instance': acc[5], 'resource': acc[3], 'designated_resource': acc[4]})
+    
+    for violation in access_violations:
+        if "Not" in violation[1]:
+            patterns['Prohibited data access'].append({'case_id': violation[0], 'rule': violation[1], 'instance': violation[2]})
+        else:
+            patterns['Ignored mandatory data acces'].append({'case_id': violation[0], 'rule': violation[1], 'instance': violation[2]})
+    
+    for violation in process_violations:
+        if "Existence" in violation[1] or "Response" in violation[1]:
+            patterns['Ignored mandatory activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': violation[2]})
+        else: #TODO definir como lidar com as outras regras, identificar
+            patterns['Prohibited activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': violation[2]})
+            
+    
 def MultiperspectiveConformanceAlgorithm():
   '''
   The algorithm accepts: a process log, a data access log, a resource model, a process DECLARE model, and a data access model.

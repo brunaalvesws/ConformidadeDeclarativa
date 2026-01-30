@@ -8,10 +8,10 @@
     
     <!-- Content -->
     <div class="card-content">
-      <!-- Upload Models Section -->
+      <!-- Upload Files Section -->
       <div class="section">
-        <h3 class="section-title">Upload Models</h3>
-        <p class="upload-label">You can find examples of the models to be uploaded in <a href="https://github.com/brunaalvesws/SMC2025-LogGenerator/tree/main/Examples"> GitHub</a> </p>
+        <h3 class="section-title">Upload Files</h3>
+        <p class="upload-label">You can find examples of the files to be uploaded in <a href="https://github.com/brunaalvesws/ConformidadeDeclarativa/tree/main/Examples"> GitHub</a> </p>
         <br>
         <div class="grid grid-cols-1 grid-cols-md-3">
           <!-- DECLARE Model -->
@@ -127,7 +127,7 @@
                 id="event-log"
                 type="file"
                 class="hidden-input"
-                (change)="onAccessFileSelected($event)"
+                (change)="onEventLogFileSelected($event)"
               />
               <button 
                 (click)="onFileInputClick('event-log')"
@@ -144,8 +144,8 @@
                 </div>
               </button>
             </div>
-            <div *ngIf="arquivoAcesso">
-              <label class="input-label">File chosen: {{ arquivoAcesso.name }}</label>
+            <div *ngIf="arquivoLogEventos">
+              <label class="input-label">File chosen: {{ arquivoLogEventos.name }}</label>
           </div>
           </div>
 
@@ -159,7 +159,7 @@
                 id="data-access-log"
                 type="file"
                 class="hidden-input"
-                (change)="onAccessFileSelected($event)"
+                (change)="onAccessLogFileSelected($event)"
               />
               <button 
                 (click)="onFileInputClick('data-access-log')"
@@ -176,14 +176,14 @@
                 </div>
               </button>
             </div>
-            <div *ngIf="arquivoAcesso">
-              <label class="input-label">File chosen: {{ arquivoAcesso.name }}</label>
+            <div *ngIf="arquivoLogAcesso">
+              <label class="input-label">File chosen: {{ arquivoLogAcesso.name }}</label>
           </div>
           </div>
     </div>
     <!-- Footer -->
     <div class="card-footer">
-      <button class="generate-button" (click)="downloadCSV()">
+      <button class="generate-button" (click)="startAlgorithm()">
         Start 
       </button>
     </div>

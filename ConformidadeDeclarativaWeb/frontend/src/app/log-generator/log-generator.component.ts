@@ -1,6 +1,4 @@
-import { ReportDTO } from './../services/processamento.service';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule, HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { ProcessamentoService } from '../services/processamento.service';
@@ -10,7 +8,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-log-generator',
   standalone: true,
-  imports: [FormsModule, CommonModule, HttpClientModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './log-generator.component.html',
   styleUrl: './log-generator.component.css'
 })
@@ -24,7 +22,6 @@ export class LogGeneratorComponent implements OnInit{
   loading = false
 
   constructor(
-    private http: HttpClient,
     private service: ProcessamentoService,
     private router: Router
   ) {

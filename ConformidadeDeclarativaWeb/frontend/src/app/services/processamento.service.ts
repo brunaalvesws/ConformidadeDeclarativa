@@ -1,20 +1,7 @@
-import { Time } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from '../../environments/environment';
-
-export interface ReportDTO {
-  Duration: Time;
-  ActivityList: [Object];
-  ProhibitedActivity: [Object];
-  UnexpectedActivity: [Object];
-  IllegalActivity: [Object];
-  IgnoredMandatoryActivity: [Object];
-  ProhibitedDataAccess: [Object];
-  UnexpectedDataAccess: [Object];
-  IllegalDataAccess: [Object];
-  IgnoredMandatoryDataAccess: [Object];
-}
+import { ReportDTO } from "../models/resultado.dto";
 
 @Injectable({ providedIn: 'root' })
 export class ProcessamentoService {

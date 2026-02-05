@@ -1,7 +1,27 @@
-/* You can add global styles to this file, and also import other style files */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-
-body {
-  font-family: 'Inter', sans-serif;
+.tree-line {
+  position: absolute;
+  left: 19px;
+  top: 32px;
+  bottom: 0;
+  width: 2px;
+  background-color: #E5E7EB;
+}
+.dark .tree-line {
+  background-color: #334155;
+}
+.tree-item:last-child > .tree-line {
+  display: none;
+}
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+details[open] > summary .rotate-icon {
+  transform: rotate(90deg);
+}
+.rotate-icon {
+  transition: transform 0.2s ease;
 }

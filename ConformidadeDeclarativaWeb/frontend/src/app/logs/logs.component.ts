@@ -1,23 +1,30 @@
 import { Component, OnInit } from '@angular/core';
-import { KeyValuePipe, NgFor } from '@angular/common';
-import { ProcessamentoService } from '../services/processamento.service';
+import { CommonModule } from '@angular/common'; 
+import { Router } from '@angular/router'; 
 import { ReportDTO } from "../models/resultado.dto";
 
 @Component({
   selector: 'app-logs',
   standalone: true,
-  imports: [NgFor, KeyValuePipe],
+  imports: [CommonModule], 
   templateUrl: './logs.component.html',
   styleUrl: './logs.component.css'
 })
-export class LogsComponent implements OnInit{
+export class LogsComponent implements OnInit {
 
-  resultado!: ReportDTO;
+  resultado: ReportDTO | null = null; 
+  dataGeracao: Date = new Date(); 
 
-  constructor( 
-    private service: ProcessamentoService){};
+  constructor(private router: Router) {
+    const nav = this.router.getCurrentNavigation();
+    if (nav?.extras.state && nav.extras.state['data']) {
+      this.resultado = nav.extras.state['data'];
+    }
+  }
 
   ngOnInit() {
-    this.resultado = this.service.getResultado();
+    if (!this.resultado && history.state['data']) {
+      this.resultado = history.state['data'];
+    }
   }
 }

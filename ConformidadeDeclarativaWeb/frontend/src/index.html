@@ -1,13 +1,48 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-50">
 <head>
   <meta charset="utf-8">
   <title>Frontend</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            primary: "#111827",
+            "primary-hover": "#374151",
+            "background-light": "#F3F4F6",
+            "background-dark": "#0F172A",
+            "card-light": "#FFFFFF",
+            "card-dark": "#1E293B",
+            "border-light": "#E5E7EB",
+            "border-dark": "#334155",
+            "text-main-light": "#111827",
+            "text-main-dark": "#F8FAFC",
+            "text-secondary-light": "#6B7280",
+            "text-secondary-dark": "#94A3B8",
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
+<body class="h-full antialiased text-gray-900 bg-background-light">
   <app-root></app-root>
 </body>
 </html>

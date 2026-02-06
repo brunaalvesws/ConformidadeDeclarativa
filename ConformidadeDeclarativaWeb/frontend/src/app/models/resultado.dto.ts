@@ -1,14 +1,29 @@
 import { Time } from "@angular/common";
 
+export interface ActivityStats {
+  name: string;
+  count: number;
+}
+
+export interface Violation {
+  title: string;      
+  description: string; 
+  severity: 'high' | 'medium' | 'low'; 
+  details: {
+    trace: string;     
+    message: string;   
+    count: number;     
+  }[];
+}
+
+
 export interface ReportDTO {
-  Duration: Time;
-  ActivityList: [Object];
-  ProhibitedActivity: [Object];
-  UnexpectedActivity: [Object];
-  IllegalActivity: [Object];
-  IgnoredMandatoryActivity: [Object];
-  ProhibitedDataAccess: [Object];
-  UnexpectedDataAccess: [Object];
-  IllegalDataAccess: [Object];
-  IgnoredMandatoryDataAccess: [Object];
+  overview: {
+    successRate: number;      
+    averageDuration: string;  
+    totalTraces: number;
+    violationCount: number;
+  };
+  activityDistribution: ActivityStats[];
+  violations: Violation[];
 }

@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    command: gunicorn --bind 0.0.0.0:5000 wsgi:app
+    command: gunicorn wsgi:app --bind 0.0.0.0:5000 --workers 1 --reload --log-level debug --error-logfile - --access-logfile -
     volumes:
       - .:/app
       - type: bind
@@ -10,4 +10,4 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - FLASK_ENV=production
+      - FLASK_ENV=development

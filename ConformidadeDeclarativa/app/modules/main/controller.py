@@ -1,11 +1,9 @@
-import pm4py
-from Declare4Py.ProcessModels.DeclareModel import DeclareModel
-from Declare4Py.D4PyEventLog import D4PyEventLog
-from Declare4Py.ProcessMiningTasks.Discovery.DeclareMiner import DeclareMiner
-from Declare4Py.ProcessMiningTasks.ConformanceChecking.MPDeclareAnalyzer import MPDeclareAnalyzer
-from Declare4Py.ProcessMiningTasks.ConformanceChecking.MPDeclareResultsBrowser import MPDeclareResultsBrowser
-from .ArquivosTeste import algoritmoconformidadev3
+from .Algorithm import MultiConformanceAlgorithm
 class MainController:
     def index(self):
-        inconformances = algoritmoconformidadev3.MultiperspectiveConformanceAlgorithm()
+        inconformances = MultiConformanceAlgorithm.MultiperspectiveConformanceAlgorithm()
+        return inconformances
+    
+    def check(self, event_log, access_log, resource_model, declare_model, access_model):
+        inconformances = MultiConformanceAlgorithm.MultiperspectiveConformanceAlgorithm(event_log, access_log, resource_model, declare_model, access_model)
         return inconformances

@@ -26,7 +26,8 @@ def check_access_conformance(process_model):
     basic_checker = MPDeclareAnalyzer(log=event_log, declare_model=process_model, consider_vacuity=False, track_violations='concept:instance')
     conf_check_res: MPDeclareResultsBrowser = basic_checker.run()
     violations = format_violations(conf_check_res.get_metric(metric="events_violated"))
-    return violations
+    size = sum(len(trace) for trace in event_log.get_log())
+    return violations, size
 
 def check_resource_conformance(process_log, access_log, resource_model):
     '''

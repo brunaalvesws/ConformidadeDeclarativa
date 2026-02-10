@@ -11,10 +11,12 @@ Passo a passo:
 """
 
 from pathlib import Path
+import time
 from .ConformanceChecking import check_access_conformance, check_activity_conformance, check_process_conformance, check_resource_conformance
 from .ConvertLogs import convert_logs, convert_model_to_rules
 from .FormatMapping import non_conformance_patterns_mapping
 from .ParseFiles import pre_process_data
+from .LogStatistics import activities_distribution
 
 
 def MultiperspectiveConformanceAlgorithm(eventPATH=str(Path(__file__).resolve().parent / 'LogSinteticoProcessoOFICIALv4.xes'),
@@ -25,7 +27,7 @@ def MultiperspectiveConformanceAlgorithm(eventPATH=str(Path(__file__).resolve().
   '''
   The algorithm accepts: a process log, a data access log, a resource model, a process DECLARE model, and a data access model.
   '''
-  
+  begin = time.time()
   process_log, access_log, resource_model, process_model, access_model, allowed_activities = pre_process_data(eventPATH, 
                                                                                                               accessPATH, 
                                                                                                               resourcePATH, 
@@ -34,7 +36,16 @@ def MultiperspectiveConformanceAlgorithm(eventPATH=str(Path(__file__).resolve().
   processed_access_model = convert_model_to_rules(access_model, process_model)
   convert_logs(process_log, access_log)
   process_conformance = check_process_conformance(process_model, process_log)
-  access_conformance = check_access_conformance(processed_access_model)
+  activities_stats = activities_distribution(process_log)
+  access_conformance, log_size = check_access_conformance(processed_access_model)
   resource_conformance = check_resource_conformance(process_log, access_log, resource_model)
   activity_conformance = check_activity_conformance(process_log, access_log, allowed_activities)
-  return non_conformance_patterns_mapping(process_conformance, access_conformance, resource_conformance, activity_conformance)
+  end = time.time()
+  duration = end - begin
+  return non_conformance_patterns_mapping(process_conformance, 
+                                          access_conformance, 
+                                          resource_conformance, 
+                                          activity_conformance, 
+                                          activities_stats, 
+                                          log_size, 
+                                          duration)

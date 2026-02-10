@@ -1,3 +1,6 @@
+from .LogStatistics import total_number_of_violations, success_rate
+
+
 def format_violations(df_violations):
     '''
     Formats the violations detected by Declare4Py conformance checking.
@@ -51,7 +54,7 @@ def format_inconformances(process_conformance, access_conformance, resource_conf
 
     return report
 
-def non_conformance_patterns_mapping(process_violations, access_violations, resource_violations, unexpected_activities):
+def non_conformance_patterns_mapping(process_violations, access_violations, resource_violations, unexpected_activities, activities_stats, log_size, duration):
     patterns = {}
     patterns['Prohibited activity'] = [] #1.5, 2.5, 3.5, 4.5, 5.5, 6.5
     patterns['Unexpected activity'] = [] #7.7
@@ -92,6 +95,16 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
             patterns['Prohibited activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': violation[2]})
         else:
             raise Exception("This rule is not supported")
-    print(patterns)    
-    return patterns
+        
+    report = {}
+    num_violations = total_number_of_violations(patterns)
+    report['overview'] = {
+        'successRate': success_rate(log_size, num_violations),
+        'averageDuration': duration,
+        'violationCount': num_violations
+    }
+    report['activityDistribution'] = activities_stats
+    report['violations'] = patterns
+    print(report)    
+    return report
             

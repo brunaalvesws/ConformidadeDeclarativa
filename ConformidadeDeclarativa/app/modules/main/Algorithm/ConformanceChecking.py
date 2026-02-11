@@ -15,13 +15,12 @@ def check_process_conformance(process_model, process_log):
     violations = format_violations(conf_check_res.get_metric(metric="events_violated"))
     return violations
 
-def check_access_conformance(process_model):
+def check_access_conformance(process_model, log):
     '''
     Checks access conformance between the log and the joint DECLARE model using Declare4Py.
     Accepts a joint access and activity log (EventLog) and a joint process model (DeclareModel).
     '''
-    event_log = D4PyEventLog(case_name="case:concept:name")
-    event_log.parse_xes_log("LogSinteticoConjuntoOFICIAL.xes")
+    event_log = D4PyEventLog(case_name="case:concept:name", log=log)
 
     basic_checker = MPDeclareAnalyzer(log=event_log, declare_model=process_model, consider_vacuity=False, track_violations='concept:instance')
     conf_check_res: MPDeclareResultsBrowser = basic_checker.run()

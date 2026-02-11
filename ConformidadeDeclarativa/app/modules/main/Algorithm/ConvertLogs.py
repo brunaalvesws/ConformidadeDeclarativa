@@ -44,7 +44,6 @@ def convert_model_to_rules(access_model, process_model):
             new_model = check_letters(value, new_model, access_model.iloc[index,0], col)
 
     declare_model = DeclareModel().parse_from_string(new_model)
-    declare_model.to_file('modelRegrasConjunto.decl')
     return declare_model
 
 def convert_logs(process_log, access_log):
@@ -60,5 +59,4 @@ def convert_logs(process_log, access_log):
     for index, row in access_log.iterrows():
         process_log_df.loc[len(process_log_df)] = [(row['concept:tool'] + ' ' + row['concept:operation'].lower()),row['time:timestamp'], row['concept:resource'], row['concept:instance'], len(process_log_df), row['@@case_index'], row['case:concept:name']]
     process_log_df = process_log_df.sort_values(['case:concept:name', 'concept:instance','time:timestamp'])
-    process_log_df.to_csv('LogTesteConjunto.csv', index=False)
-    pm4py.write_xes(process_log_df, "LogSinteticoConjuntoOFICIAL.xes")
+    return pm4py.convert_to_event_log(process_log_df)

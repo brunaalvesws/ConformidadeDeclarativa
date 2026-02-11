@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LogGeneratorComponent } from './log-generator.component';
+import { ParseFilesComponent } from './parse-files.component';
 
-describe('LogGeneratorComponent', () => {
-  let component: LogGeneratorComponent;
-  let fixture: ComponentFixture<LogGeneratorComponent>;
+describe('ParseFilesComponent', () => {
+  let component: ParseFilesComponent;
+  let fixture: ComponentFixture<ParseFilesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LogGeneratorComponent]
+      imports: [ParseFilesComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(LogGeneratorComponent);
+    fixture = TestBed.createComponent(ParseFilesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

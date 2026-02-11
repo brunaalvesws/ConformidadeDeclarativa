@@ -3,16 +3,17 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
 import { ProcessamentoService } from '../services/processamento.service';
 import { Router } from '@angular/router';
+import { ReportDTO } from '../models/report.dto';
 
 
 @Component({
-  selector: 'app-log-generator',
+  selector: 'app-parse-files',
   standalone: true,
   imports: [FormsModule, CommonModule],
-  templateUrl: './log-generator.component.html',
-  styleUrl: './log-generator.component.css'
+  templateUrl: './parse-files.component.html',
+  styleUrl: './parse-files.component.css'
 })
-export class LogGeneratorComponent implements OnInit{
+export class ParseFilesComponent implements OnInit{
   declareModel = ''
   arquivoDeclare: File | null = null;
   arquivoAcesso: File | null = null;
@@ -83,22 +84,18 @@ export class LogGeneratorComponent implements OnInit{
       formData.append('declare', this.arquivoDeclare!); 
       formData.append('organizational', this.arquivoOrganizacional!); 
       formData.append('access', this.arquivoAcesso!); 
-      formData.append('logeventos', this.arquivoLogEventos!); 
-      formData.append('logacesso', this.arquivoLogAcesso!); 
+      formData.append('accessLog', this.arquivoLogAcesso!); 
+      formData.append('eventLog', this.arquivoLogEventos!); 
 
-      // this.service.processarArquivos(formData).subscribe({
-      //   next: (resultado: ReportDTO) => {
-      //     this.service.setResultado(resultado);
-      //     this.router.navigate(['/report']);
-      //     this.loading = false;
-      //   },
-      //   error: (err: any) => {
-      //     this.loading = false; 
-      //     alert(err.error?.message || 'Unexpected Error');
-      //   }
-      // });
-      this.router.navigate(['/report']);
-
+      this.service.processarArquivos(formData).subscribe({
+        next: (resultado: ReportDTO) => {
+          this.service.setResultado(resultado);
+          this.router.navigate(['/report']);
+        },
+        error: (err: any) => {
+          alert(err.error?.message || 'Unexpected Error');
+        }
+      });
     } else {
       alert('You must upload a DECLARE model, an organizational model, an access model, an event log and a data access log to start the conformance checking')
     }

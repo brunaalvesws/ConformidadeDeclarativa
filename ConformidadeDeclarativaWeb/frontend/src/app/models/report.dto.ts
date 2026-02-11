@@ -6,14 +6,14 @@ export interface ActivityStats {
 }
 
 export interface Violation {
-  title: string;      
-  description: string; 
-  severity: 'high' | 'medium' | 'low'; 
-  details: {
-    trace: string;     
-    message: string;   
-    count: number;     
-  }[];
+  case_id: string;      
+  rule: string; 
+  instance: number | number[];
+  name: string;
+  tool: string;
+  resource: string;
+  activity: string;
+  designated_resource: string;
 }
 
 
@@ -21,7 +21,6 @@ export interface ReportDTO {
   overview: {
     successRate: number;      
     averageDuration: string;  
-    totalTraces: number;
     violationCount: number;
   };
   activityDistribution: ActivityStats[];

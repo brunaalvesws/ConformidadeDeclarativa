@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { Router } from '@angular/router'; 
-import { ReportDTO } from "../models/resultado.dto";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable'
+import { ReportDTO } from "../models/report.dto";
+import { ProcessamentoService } from '../services/processamento.service';
 
 @Component({
   selector: 'app-logs',
@@ -17,53 +18,47 @@ export class LogsComponent implements OnInit {
   resultado: ReportDTO | null = null; 
   dataGeracao: Date = new Date(); 
 
-  constructor(private router: Router) {
-    const nav = this.router.getCurrentNavigation();
-    if (nav?.extras.state && nav.extras.state['data']) {
-      this.resultado = nav.extras.state['data'];
-    }
-  }
+  constructor(private service: ProcessamentoService) {}
 
   ngOnInit() {
-  if (!this.resultado && history.state['data']) {
-    this.resultado = history.state['data'];
+    this.resultado = this.service.getResultado();
   }
 
-  if (!this.resultado) {
-    this.resultado = {
-      overview: {
-        successRate: 85.5,
-        averageDuration: "12m 30s",
-        totalTraces: 150,
-        violationCount: 2
-      },
-      activityDistribution: [
-        { name: "Receber Pedido", count: 150 },
-        { name: "Verificar Estoque", count: 140 },
-        { name: "Enviar Fatura", count: 120 },
-        { name: "Entregar", count: 100 }
-      ],
-      violations: [
-        {
-          title: "Atividade Obrigatória Faltando",
-          description: "O fluxo exige que 'Verificar Estoque' aconteça antes do envio.",
-          severity: "high",
-          details: [
-            { trace: "Trace 001", message: "Pulou a verificação de estoque", count: 1 }
-          ]
-        },
-        {
-          title: "Usuário Não Autorizado",
-          description: "O usuário 'Estagiario' executou uma ação restrita 'Aprovar Pagamento'.",
-          severity: "medium",
-          details: [
-             { trace: "Trace 050", message: "Executado por user_123", count: 1 }
-          ]
-        }
-      ]
-    };
-  }
-}
+  // if (!this.resultado) {
+  //   this.resultado = {
+  //     overview: {
+  //       successRate: 85.5,
+  //       averageDuration: "12m 30s",
+  //       totalTraces: 150,
+  //       violationCount: 2
+  //     },
+  //     activityDistribution: [
+  //       { name: "Receber Pedido", count: 150 },
+  //       { name: "Verificar Estoque", count: 140 },
+  //       { name: "Enviar Fatura", count: 120 },
+  //       { name: "Entregar", count: 100 }
+  //     ],
+  //     violations: [
+  //       {
+  //         title: "Atividade Obrigatória Faltando",
+  //         description: "O fluxo exige que 'Verificar Estoque' aconteça antes do envio.",
+  //         severity: "high",
+  //         details: [
+  //           { trace: "Trace 001", message: "Pulou a verificação de estoque", count: 1 }
+  //         ]
+  //       },
+  //       {
+  //         title: "Usuário Não Autorizado",
+  //         description: "O usuário 'Estagiario' executou uma ação restrita 'Aprovar Pagamento'.",
+  //         severity: "medium",
+  //         details: [
+  //            { trace: "Trace 050", message: "Executado por user_123", count: 1 }
+  //         ]
+  //       }
+  //     ]
+  //   };
+  // }
+  // }
 
   onExportCSV(): void {
     if (!this.resultado) {

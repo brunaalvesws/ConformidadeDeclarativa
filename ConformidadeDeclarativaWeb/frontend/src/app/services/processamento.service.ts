@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from '../../environments/environment';
-import { ReportDTO } from "../models/resultado.dto";
+import { ReportDTO } from "../models/report.dto";
 
 @Injectable({ providedIn: 'root' })
 export class ProcessamentoService {

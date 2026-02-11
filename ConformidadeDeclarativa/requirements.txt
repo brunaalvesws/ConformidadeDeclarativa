@@ -5,4 +5,3 @@ gunicorn
 pm4py==2.7.19.8
 git+https://github.com/brunaalvesws/Declare4Py.git@main
 flask_cors
-rustxes

@@ -5,6 +5,10 @@ import { ProcessamentoService } from '../services/processamento.service';
 import { Router } from '@angular/router';
 import { ReportDTO } from '../models/report.dto';
 
+interface ApiResponse {
+  data: ReportDTO;
+}
+
 
 @Component({
   selector: 'app-parse-files',
@@ -88,8 +92,8 @@ export class ParseFilesComponent implements OnInit{
       formData.append('eventLog', this.arquivoLogEventos!); 
 
       this.service.processarArquivos(formData).subscribe({
-        next: (resultado: ReportDTO) => {
-          this.service.setResultado(resultado);
+        next: (resultado: ApiResponse) => {
+          this.service.setResultado(resultado.data);
           this.router.navigate(['/report']);
         },
         error: (err: any) => {

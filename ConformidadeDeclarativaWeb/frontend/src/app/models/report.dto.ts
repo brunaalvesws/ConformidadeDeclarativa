@@ -1,8 +1,7 @@
 import { Time } from "@angular/common";
 
 export interface ActivityStats {
-  name: string;
-  count: number;
+   [key: string]: number;
 }
 
 export interface Violation {
@@ -20,9 +19,11 @@ export interface Violation {
 export interface ReportDTO {
   overview: {
     successRate: number;      
-    averageDuration: string;  
+    averageDuration: number;  
     violationCount: number;
   };
   activityDistribution: ActivityStats[];
-  violations: Violation[];
+  violations: {
+     [key: string]: Violation[];
+  };
 }

@@ -3,6 +3,10 @@ import { Injectable } from "@angular/core";
 import { environment } from '../../environments/environment';
 import { ReportDTO } from "../models/report.dto";
 
+interface ApiResponse {
+  data: ReportDTO;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProcessamentoService {
 
@@ -11,7 +15,7 @@ export class ProcessamentoService {
   constructor(private http: HttpClient) {}
 
   processarArquivos(files: FormData) {
-    return this.http.post<ReportDTO>(`${environment.apiUrl}/check`, files);
+    return this.http.post<ApiResponse>(`${environment.apiUrl}/check`, files);
   }
 
   setResultado(resultado: ReportDTO) {

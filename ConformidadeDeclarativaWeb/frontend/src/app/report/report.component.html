@@ -1,12 +1,21 @@
 <div class="flex flex-col items-center w-full min-h-screen p-4">
-
-  <div *ngIf="!resultado" class="flex flex-col items-center justify-center mt-20 text-center">
-    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mb-4"></div>
+  <div
+    *ngIf="!resultado"
+    class="flex flex-col items-center justify-center mt-20 text-center"
+  >
+    <div
+      class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mb-4"
+    ></div>
     <p class="text-lg text-gray-500 font-medium">Processing logs...</p>
   </div>
 
-  <div *ngIf="resultado" class="w-full max-w-4xl mt-6 mb-8 text-center animate-fade-in">
-    <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl mb-2">
+  <div
+    *ngIf="resultado"
+    class="w-full max-w-4xl mt-6 mb-8 text-center animate-fade-in"
+  >
+    <h1
+      class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl mb-2"
+    >
       Multi-perspective Conformance Checking Report
     </h1>
     <p class="text-base text-gray-500">
@@ -14,27 +23,36 @@
     </p>
   </div>
 
-  <div *ngIf="resultado" class="w-full max-w-4xl bg-white shadow-xl rounded-xl border border-gray-200 overflow-hidden transition-all duration-200">
-    
-    <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center bg-white gap-4">
-      
+  <div
+    *ngIf="resultado"
+    class="w-full max-w-4xl bg-white shadow-xl rounded-xl border border-gray-200 overflow-hidden transition-all duration-200"
+  >
+    <div
+      class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center bg-white gap-4"
+    >
       <div class="flex flex-col items-start">
         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
           <span class="material-icons-round text-gray-900">analytics</span>
           Report
         </h2>
         <p class="text-xs text-gray-400 ml-8 mt-0.5">
-          Generated on {{ dataGeracao | date:'dd MMM yyyy, HH:mm' }}
+          Generated on {{ dataGeracao | date: "dd MMM yyyy, HH:mm" }}
         </p>
       </div>
 
       <div class="flex space-x-3 w-full sm:w-auto">
-        <button (click)="onExportCSV()" class="flex-1 sm:flex-none inline-flex justify-center items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+        <button
+          (click)="onExportCSV()"
+          class="flex-1 sm:flex-none inline-flex justify-center items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+        >
           <span class="material-icons-round text-sm mr-2">file_download</span>
           Export PDF
         </button>
 
-        <button (click)="onRegenerate()" class="flex-1 sm:flex-none inline-flex justify-center items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
+        <button
+          (click)="onRegenerate()"
+          class="flex-1 sm:flex-none inline-flex justify-center items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
+        >
           <span class="material-icons-round text-sm mr-2">refresh</span>
           Regenerate
         </button>
@@ -42,108 +60,195 @@
     </div>
 
     <div class="p-6 bg-white">
-      
       <div class="tree-item relative pb-5">
         <details class="group" open>
-          <summary class="flex items-center cursor-pointer list-none py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors select-none">
-            <span class="rotate-icon material-icons-round text-gray-400 mr-3 transform transition-transform group-open:rotate-90">chevron_right</span>
-            
+          <summary
+            class="flex items-center cursor-pointer list-none py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors select-none"
+          >
+            <span
+              class="rotate-icon material-icons-round text-gray-400 mr-3 transform transition-transform group-open:rotate-90"
+              >chevron_right</span
+            >
+
             <div class="flex-1 flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="bg-blue-50 p-2 rounded-lg flex items-center justify-center">
-                  <span class="material-icons-round text-blue-600 text-sm">settings_suggest</span>
+                <div
+                  class="bg-blue-50 p-2 rounded-lg flex items-center justify-center"
+                >
+                  <span class="material-icons-round text-blue-600 text-sm"
+                    >settings_suggest</span
+                  >
                 </div>
                 <div>
-                  <h3 class="text-sm font-bold text-gray-900">Conformance Checking Execution Overview</h3>
-                  <p class="text-xs text-gray-500 mt-0.5">Global performance metrics across traces</p>
+                  <h3 class="text-sm font-bold text-gray-900">
+                    Conformance Checking Execution Overview
+                  </h3>
+                  <p class="text-xs text-gray-500 mt-0.5">
+                    Global performance metrics across traces
+                  </p>
                 </div>
               </div>
-              
-              <span [class]="resultado.overview.successRate > 90 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'" 
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">
+
+              <span
+                [class]="
+                  resultado.overview.successRate > 90
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                "
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide"
+              >
                 {{ resultado.overview.successRate }}% Success
               </span>
             </div>
           </summary>
-          
+
           <div class="ml-10 mt-2 pl-6 border-l-2 border-gray-100 space-y-2">
             <div class="flex items-center justify-between py-1 pr-2">
               <div class="flex items-center gap-2">
-                <span class="material-icons-round text-gray-400 text-sm">timer</span>
-                <span class="text-sm font-medium text-gray-700">Average Duration</span>
+                <span class="material-icons-round text-gray-400 text-sm"
+                  >timer</span
+                >
+                <span class="text-sm font-medium text-gray-700"
+                  >Average Duration</span
+                >
               </div>
-              <span class="text-xs font-mono text-gray-500 bg-gray-50 px-2 py-1 rounded">{{ resultado.overview.averageDuration }}</span>
+              <span
+                class="text-xs font-mono text-gray-500 bg-gray-50 px-2 py-1 rounded"
+                >{{ resultado.overview.averageDuration }}</span
+              >
             </div>
           </div>
+
+          <details class="group">
+            <summary
+              class="flex items-center cursor-pointer list-none py-1.5 px-2 rounded-md hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <span
+                class="rotate-icon material-icons-round text-gray-400 text-sm mr-2"
+                >chevron_right</span
+              >
+              <span
+                class="text-sm font-medium text-text-main-light dark:text-text-main-dark"
+                >Activity Distribution</span
+              >
+            </summary>
+            <div class="ml-6 mt-1 space-y-1">
+              <ng-container *ngFor="let activity of resultado.activityDistribution">
+              <div class="flex justify-between text-xs py-1 px-2">
+                <span
+                  class="text-text-secondary-light dark:text-text-secondary-dark"
+                  >{{ activity['key'] }}</span
+                >
+                <span
+                  class="font-mono text-text-main-light dark:text-text-main-dark"
+                  >{{ activity['value'] }} events</span
+                >
+              </div>
+              </ng-container>
+            </div>
+          </details>
         </details>
       </div>
 
       <div class="tree-item relative">
         <details class="group" open>
-          <summary class="flex items-center cursor-pointer list-none py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors select-none">
-            <span class="rotate-icon material-icons-round text-gray-400 mr-3 transform transition-transform group-open:rotate-90">chevron_right</span>
-            
+          <summary
+            class="flex items-center cursor-pointer list-none py-2 px-2 rounded-lg hover:bg-gray-50 transition-colors select-none"
+          >
+            <span
+              class="rotate-icon material-icons-round text-gray-400 mr-3 transform transition-transform group-open:rotate-90"
+              >chevron_right</span
+            >
+
             <div class="flex-1 flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="bg-purple-50 p-2 rounded-lg flex items-center justify-center">
-                  <span class="material-icons-round text-purple-600 text-sm">fact_check</span>
+                <div
+                  class="bg-purple-50 p-2 rounded-lg flex items-center justify-center"
+                >
+                  <span class="material-icons-round text-purple-600 text-sm"
+                    >fact_check</span
+                  >
                 </div>
                 <div>
-                  <h3 class="text-sm font-bold text-gray-900">Conformance Checking Results</h3>
+                  <h3 class="text-sm font-bold text-gray-900">
+                    Conformance Checking Results
+                  </h3>
                   <p class="text-xs text-gray-500 mt-0.5">Anomaly Patterns</p>
                 </div>
               </div>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-yellow-100 text-yellow-800">
-                {{ resultado.violations.length }} Violations
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-yellow-100 text-yellow-800"
+              >
+                {{ resultado.overview.violationCount }} Violations
               </span>
             </div>
           </summary>
-          
+
           <div class="ml-10 mt-3 pl-6 border-l-2 border-gray-100">
-             
-             <ng-container *ngFor="let item of resultado.violations">
-               <details class="group mb-3">
-                <summary class="flex items-center cursor-pointer list-none py-2 px-2 rounded-lg hover:bg-red-50/50 transition-colors border border-transparent hover:border-red-100">
-                  <span class="rotate-icon material-icons-round text-gray-400 mr-3 transform transition-transform group-open:rotate-90">chevron_right</span>
-                  
+            <ng-container *ngFor="let item of resultado.violations | keyvalue">
+              <details class="group mb-3">
+                <summary
+                  class="flex items-center cursor-pointer list-none py-2 px-2 rounded-lg hover:bg-red-50/50 transition-colors border border-transparent hover:border-red-100"
+                >
+                  <span
+                    class="rotate-icon material-icons-round text-gray-400 mr-3 transform transition-transform group-open:rotate-90"
+                    >chevron_right</span
+                  >
+
                   <div class="flex-1 flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                      <div class="bg-orange-50 p-1.5 rounded-md flex items-center justify-center">
-                        <span class="material-icons-round text-orange-600 text-sm">security</span>
+                      <div
+                        class="bg-orange-50 p-1.5 rounded-md flex items-center justify-center"
+                      >
+                        <span
+                          class="material-icons-round text-orange-600 text-sm"
+                          >security</span
+                        >
                       </div>
                       <div>
-                        <h3 class="text-sm font-bold text-gray-900">{{ item.title }}</h3>
-                        <p class="text-xs text-gray-500 mt-0.5">{{ item.description }}</p>
+                        <h3 class="text-sm font-bold text-gray-900">
+                          {{ item.key }}
+                        </h3>
+                        <p class="text-xs text-gray-500 mt-0.5">
+                          {{ item.key }}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </summary>
-                
+                <ng-container *ngFor="let violation of item.value">
                 <div class="ml-9 mt-2 space-y-2">
-                  <div class="flex flex-col p-3 rounded-lg bg-red-50 border border-red-100">
+                  <div
+                    class="flex flex-col p-3 rounded-lg bg-red-50 border border-red-100"
+                  >
                     <div class="flex items-center justify-between mb-1">
-                      <span class="text-xs font-bold text-red-800 flex items-center gap-1">
-                        <span class="material-icons-round text-xs">warning</span>
-                        Constraint Violation
+                      <span
+                        class="text-xs font-bold text-red-800 flex items-center gap-1"
+                      >
+                        <span class="material-icons-round text-xs"
+                          >warning</span
+                        >
+                        No trace número {{ violation.case_id}} a regra  {{ violation.rule }} foi violada na instância {{ violation.instance }}
                       </span>
-                      <span class="text-[10px] font-mono text-red-600 bg-white/50 px-1.5 py-0.5 rounded">1 occurrence</span>
+                      <span
+                        class="text-[10px] font-mono text-red-600 bg-white/50 px-1.5 py-0.5 rounded"
+                        >1 occurrence</span
+                      >
                     </div>
                     <p class="text-xs text-gray-600 ml-5 leading-relaxed">
-                      Severity: {{ item.severity }}. 
-                      <span *ngIf="item.details && item.details.length > 0">
+                      Severity: {{ violation.activity }}.
+                      <!-- <span *ngIf="item.details && item.details.length > 0">
                         {{ item.details[0].message }}
-                      </span>
+                      </span> -->
                     </p>
                   </div>
                 </div>
+                </ng-container>
               </details>
-             </ng-container>
-
+            </ng-container>
           </div>
         </details>
       </div>
-
     </div>
   </div>
-
 </div>

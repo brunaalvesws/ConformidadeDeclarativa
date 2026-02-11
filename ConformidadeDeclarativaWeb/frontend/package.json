@@ -19,6 +19,9 @@
     "@angular/platform-browser-dynamic": "^17.3.0",
     "@angular/router": "^17.3.0",
     "frontend": "file:",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.1.0",
+    "jspdf-autotable": "^5.0.7",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"

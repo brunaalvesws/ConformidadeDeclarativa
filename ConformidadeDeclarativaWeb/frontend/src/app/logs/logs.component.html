@@ -29,12 +29,12 @@
       </div>
 
       <div class="flex space-x-3 w-full sm:w-auto">
-        <button class="flex-1 sm:flex-none inline-flex justify-center items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+        <button (click)="onExportCSV()" class="flex-1 sm:flex-none inline-flex justify-center items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
           <span class="material-icons-round text-sm mr-2">file_download</span>
-          Export CSV
+          Export PDF
         </button>
 
-        <button class="flex-1 sm:flex-none inline-flex justify-center items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
+        <button (click)="onRegenerate()" class="flex-1 sm:flex-none inline-flex justify-center items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
           <span class="material-icons-round text-sm mr-2">refresh</span>
           Regenerate
         </button>

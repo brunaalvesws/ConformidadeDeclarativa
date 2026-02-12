@@ -69,16 +69,16 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
         patterns['Unexpected activity'].append({'name': act[0], 'case_id': act[1], 'instance': act[2], 'resource': act[3]})
         
     for acc in unexpected_activities['UnexpectedDataAccess']:
-        patterns['Unexpected data access'].append({'tool': acc[0], 'case_id': acc[1], 'instance': acc[2], 'resource': acc[3], 'activity': acc[4]})
+        patterns['Unexpected data access'].append({'tool': acc[0], 'operation': acc[1], 'case_id': acc[2], 'instance': acc[3], 'resource': acc[4], 'activity': acc[5]})
         
     for act in resource_violations['IllegalTeamActivity']:
         patterns['Illegal activity'].append({'name': act[0], 'case_id': act[1], 'resource': act[2], 'instance': act[3]})
         
     for acc in resource_violations['IllegalTeamAccess']:
-        patterns['Illegal data access'].append({'tool': acc[0], 'activity': acc[1], 'case_id': acc[2], 'instance': acc[4], 'resource': acc[3]})
+        patterns['Illegal data access'].append({'tool': acc[0], 'activity': acc[1], 'case_id': acc[2], 'instance': acc[4], 'resource': acc[3], 'operation': acc[5]})
     
     for acc in resource_violations['IllegalResourceAccess']:
-        patterns['Illegal data access'].append({'tool': acc[0], 'activity': acc[1], 'case_id': acc[2], 'instance': acc[5], 'resource': acc[3], 'designated_resource': acc[4]})
+        patterns['Illegal data access'].append({'tool': acc[0], 'activity': acc[1], 'case_id': acc[2], 'instance': acc[5], 'resource': acc[3], 'designated_resource': acc[4], 'operation': acc[6]})
     
     for violation in access_violations:
         if "Not" in violation[1]:

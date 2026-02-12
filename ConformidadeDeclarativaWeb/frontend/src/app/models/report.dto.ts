@@ -13,6 +13,7 @@ export interface Violation {
   resource: string;
   activity: string;
   designated_resource: string;
+  operation: string;
 }
 
 

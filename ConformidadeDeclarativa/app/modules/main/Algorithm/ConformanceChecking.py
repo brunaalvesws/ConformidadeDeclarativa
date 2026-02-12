@@ -15,7 +15,7 @@ def check_process_conformance(process_model, process_log):
     violations = format_violations(conf_check_res.get_metric(metric="events_violated"))
     return violations
 
-def check_access_conformance(process_model, log):
+def check_access_conformance(process_model, log): #TODO pensar como unir as duas regras violadas e devolver apenas uma violação
     '''
     Checks access conformance between the log and the joint DECLARE model using Declare4Py.
     Accepts a joint access and activity log (EventLog) and a joint process model (DeclareModel).
@@ -57,9 +57,9 @@ def check_resource_conformance(process_log, access_log, resource_model):
             activity_access = accesses[accesses['concept:instance']== activity['concept:instance']]
             for j, acc in activity_access.iterrows():
                 if activity_resource != acc['concept:resource']:
-                    violations["IllegalResourceAccess"].append([acc['concept:tool'], activity['concept:name'], case_id, acc['concept:resource'], activity_resource, acc['concept:instance']])
+                    violations["IllegalResourceAccess"].append([acc['concept:tool'], activity['concept:name'], case_id, acc['concept:resource'], activity_resource, acc['concept:instance'], acc['concept:operation']])
                 if acc['concept:resource'] not in resources:
-                    violations["IllegalTeamAccess"].append([acc['concept:tool'], activity['concept:name'], case_id, acc['concept:resource'], acc['concept:instance']])
+                    violations["IllegalTeamAccess"].append([acc['concept:tool'], activity['concept:name'], case_id, acc['concept:resource'], acc['concept:instance'], acc['concept:operation']])
 
     return violations
 
@@ -88,7 +88,7 @@ def check_activity_conformance(process_log, access_log, allowed_activities_set):
             activity_accesses = accesses[accesses['concept:instance'] == activity['concept:instance']]
             activity_conformance['UnexpectedActivity'].append([activity_name, case_id, instance, activity_resource])
             for j, acc in activity_accesses.iterrows():
-                activity_conformance['UnexpectedDataAccess'].append([acc['concept:tool'], case_id, instance, acc['concept:resource'], activity_name])
+                activity_conformance['UnexpectedDataAccess'].append([acc['concept:tool'], acc['concept:operation'], case_id, instance, acc['concept:resource'], activity_name])
 
 
     return activity_conformance

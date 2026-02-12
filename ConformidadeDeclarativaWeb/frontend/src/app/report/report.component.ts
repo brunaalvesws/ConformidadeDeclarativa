@@ -6,6 +6,33 @@ import autoTable from 'jspdf-autotable'
 import { ReportDTO } from "../models/report.dto";
 import { ProcessamentoService } from '../services/processamento.service';
 
+export const NON_CONFORMANCE_CATEGORY_DESCRIPTIONS: Record<string, string> = {
+
+  "Prohibited activity":
+    "An activity forbidden by the process model but observed in the event log.",
+
+  "Unexpected activity":
+    "An activity not defined in the process model but observed in the event log.",
+
+  "Illegal activity":
+    "An activity performed by someone outside of the designated team.",
+
+  "Ignored mandatory activity":
+    "A mandatory activity defined in the model that was not executed in the event log.",
+
+  "Prohibited data access":
+    "A data access explicitly forbidden by the model but performed in the event log.",
+
+  "Unexpected data access":
+    "A data access not defined in the model but observed in the event log.",
+
+  "Illegal data access":
+    "A data access performed by someone outside of the designated team or not assigned to the corresponding activity.",
+
+  "Ignored mandatory data access":
+    "A mandatory data access defined in the model that was not executed in the event log."
+};
+
 @Component({
   selector: 'app-report',
   standalone: true,
@@ -159,6 +186,27 @@ export class ReportComponent implements OnInit {
     onRegenerate(): void {
       alert('Botão de Regenerar foi clicado')
       console.log('Função Regenerar acionada');
+    }
+
+    getDescription(category: string): string {
+      return NON_CONFORMANCE_CATEGORY_DESCRIPTIONS[category] 
+            ?? "Unknown category";
+    }
+
+    // TODO formatar as letras crud para a operação
+
+    formatDuration(seconds: number): string {
+      const totalMilliseconds = Math.floor(seconds * 1000);
+
+      const hours = Math.floor(totalMilliseconds / 3600000);
+      const minutes = Math.floor((totalMilliseconds % 3600000) / 60000);
+      const secs = Math.floor((totalMilliseconds % 60000) / 1000);
+      const milliseconds = totalMilliseconds % 1000;
+
+      return `${hours.toString().padStart(2, '0')}h `
+          + `${minutes.toString().padStart(2, '0')}m `
+          + `${secs.toString().padStart(2, '0')}s `
+          + `${milliseconds.toString().padStart(3, '0')}ms`;
     }
 
 }

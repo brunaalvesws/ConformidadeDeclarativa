@@ -24,7 +24,7 @@ export const NON_CONFORMANCE_CATEGORY_DESCRIPTIONS: Record<string, string> = {
     "A data access explicitly forbidden by the model but performed in the event log.",
 
   "Unexpected data access":
-    "A data access not defined in the model but observed in the event log.",
+    "A data access linked to an unexpected activity.",
 
   "Illegal data access":
     "A data access performed by someone outside of the designated team or not assigned to the corresponding activity.",
@@ -50,42 +50,6 @@ export class ReportComponent implements OnInit {
   ngOnInit() {
     this.resultado = this.service.getResultado();
   }
-
-  // if (!this.resultado) {
-  //   this.resultado = {
-  //     overview: {
-  //       successRate: 85.5,
-  //       averageDuration: "12m 30s",
-  //       totalTraces: 150,
-  //       violationCount: 2
-  //     },
-  //     activityDistribution: [
-  //       { name: "Receber Pedido", count: 150 },
-  //       { name: "Verificar Estoque", count: 140 },
-  //       { name: "Enviar Fatura", count: 120 },
-  //       { name: "Entregar", count: 100 }
-  //     ],
-  //     violations: [
-  //       {
-  //         title: "Atividade Obrigatória Faltando",
-  //         description: "O fluxo exige que 'Verificar Estoque' aconteça antes do envio.",
-  //         severity: "high",
-  //         details: [
-  //           { trace: "Trace 001", message: "Pulou a verificação de estoque", count: 1 }
-  //         ]
-  //       },
-  //       {
-  //         title: "Usuário Não Autorizado",
-  //         description: "O usuário 'Estagiario' executou uma ação restrita 'Aprovar Pagamento'.",
-  //         severity: "medium",
-  //         details: [
-  //            { trace: "Trace 050", message: "Executado por user_123", count: 1 }
-  //         ]
-  //       }
-  //     ]
-  //   };
-  // }
-  // }
 
   onExportCSV(): void {
   //   if (!this.resultado) {
@@ -193,7 +157,22 @@ export class ReportComponent implements OnInit {
             ?? "Unknown category";
     }
 
-    // TODO formatar as letras crud para a operação
+    formatOperation(action: string): string {
+      const actions: Record<string, string> = {
+        c: 'create',
+        r: 'read',
+        u: 'update',
+        d: 'delete'
+      };
+
+      const result = actions[action.toLowerCase()];
+      if (!result) {
+        throw new Error("Invalid operation");
+      }
+
+      return result;
+    }
+
 
     formatDuration(seconds: number): string {
       const totalMilliseconds = Math.floor(seconds * 1000);

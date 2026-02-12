@@ -227,7 +227,7 @@
                           <span 
                             class="material-icons-round text-xs">warning</span>
                           Data access: 
-                          {{ violation.operation }} on {{ violation.tool }} in the activity {{ violation.activity }}
+                          {{ formatOperation(violation.operation) }} on {{ violation.tool }} in the activity {{ violation.activity }}
                         </span>
                       </div>
                       <p *ngIf="item.key.includes('mandatory') || item.key.includes('Prohibited')" class="text-xs text-gray-600 ml-5 leading-relaxed">

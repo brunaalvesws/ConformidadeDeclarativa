@@ -1,4 +1,26 @@
+
+
 from .LogStatistics import total_number_of_violations, success_rate
+
+
+import re
+
+def parse_constraint(rule: str):
+    print(rule)
+    
+    pattern = r"\[(.*?)\s+([crudCRUD]),\s+(.*?)(?:\s+(?:complete))?\]"
+
+    match = re.search(pattern, rule)
+
+    if not match:
+        raise ValueError("Invalid rule")
+
+    tool = match.group(1).strip()
+    operation = match.group(2).lower()
+    activity = match.group(3).strip()
+
+    return activity, tool, operation
+
 
 
 def format_violations(df_violations):
@@ -81,10 +103,12 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
         patterns['Illegal data access'].append({'tool': acc[0], 'activity': acc[1], 'case_id': acc[2], 'instance': acc[5], 'resource': acc[3], 'designated_resource': acc[4], 'operation': acc[6]})
     
     for violation in access_violations:
-        if "Not" in violation[1]:
-            patterns['Prohibited data access'].append({'case_id': violation[0], 'rule': violation[1], 'instance': violation[2]})
-        else:
-            patterns['Ignored mandatory data access'].append({'case_id': violation[0], 'rule': violation[1], 'instance': violation[2]})
+        if 'Precedence' in violation[1]:
+            activity, tool, operation = parse_constraint(violation[1])
+            if "Not" in violation[1]:
+                patterns['Prohibited data access'].append({'case_id': violation[0], 'tool': tool, 'activity': activity, 'operation': operation, 'instance': violation[2]})
+            else:
+                patterns['Ignored mandatory data access'].append({'case_id': violation[0], 'tool': tool, 'activity': activity, 'operation': operation, 'instance': violation[2]})
     
     for violation in process_violations:
         if any(regra in violation[1] for regra in ["Existence", "Response", "Init", "End", "AlternateResponse", "ChainResponse", "RespondedExistence", "Succession", "AlternateSuccession", "ChainSuccession", "CoExistence"]):

@@ -208,7 +208,7 @@
                     <div
                       class="flex flex-col p-3 rounded-lg bg-red-50 border border-red-100">
                       <div class="flex items-center justify-between mb-1">
-                        <span *ngIf="item.key.includes('mandatory')  || item.key.includes('Prohibited')"
+                        <span *ngIf="item.key.includes('mandatory activity')  || item.key.includes('Prohibited activity')"
                           class="text-xs font-bold text-red-800 flex items-center gap-1">
                           <span 
                             class="material-icons-round text-xs">warning</span>
@@ -222,7 +222,7 @@
                           Activity: 
                           {{ violation.name }} 
                         </span>
-                        <span *ngIf="item.key.includes('Unexpected data') || item.key.includes('Illegal data')"
+                        <span *ngIf="item.key.includes('data')"
                           class="text-xs font-bold text-red-800 flex items-center gap-1">
                           <span 
                             class="material-icons-round text-xs">warning</span>
@@ -230,8 +230,14 @@
                           {{ formatOperation(violation.operation) }} on {{ violation.tool }} in the activity {{ violation.activity }}
                         </span>
                       </div>
-                      <p *ngIf="item.key.includes('mandatory') || item.key.includes('Prohibited')" class="text-xs text-gray-600 ml-5 leading-relaxed">
+                      <p *ngIf="item.key.includes('mandatory activity') || item.key.includes('Prohibited activity')" class="text-xs text-gray-600 ml-5 leading-relaxed">
                         In trace number {{ violation.case_id }}, this rule was violated by instance number {{ violation.instance }}. 
+                      </p>
+                      <p *ngIf="item.key.includes('mandatory data')" class="text-xs text-gray-600 ml-5 leading-relaxed">
+                        In trace number {{ violation.case_id }}, there was a mandatory data access that was not done on instance number {{ violation.instance }}. 
+                      </p>
+                      <p *ngIf="item.key.includes('Prohibited data')" class="text-xs text-gray-600 ml-5 leading-relaxed">
+                        In trace number {{ violation.case_id }}, this data access was not allowed to be done on instance number {{ violation.instance }}. 
                       </p>
                       <p *ngIf="item.key.includes('Unexpected activity')" class="text-xs text-gray-600 ml-5 leading-relaxed">
                         In trace number {{ violation.case_id }}, this activity was done by the resource {{ violation.resource }} on instance {{ violation.instance }}. 

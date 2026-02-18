@@ -7,7 +7,7 @@ export interface ActivityStats {
 export interface Violation {
   case_id: string;      
   rule: string; 
-  instance: number | number[];
+  instance: string | string[];
   name: string;
   tool: string;
   resource: string;

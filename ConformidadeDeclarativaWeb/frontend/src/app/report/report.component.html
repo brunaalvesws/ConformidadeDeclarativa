@@ -230,8 +230,11 @@
                           {{ formatOperation(violation.operation) }} on {{ violation.tool }} in the activity {{ violation.activity }}
                         </span>
                       </div>
-                      <p *ngIf="item.key.includes('mandatory activity') || item.key.includes('Prohibited activity')" class="text-xs text-gray-600 ml-5 leading-relaxed">
-                        In trace number {{ violation.case_id }}, this rule was violated by instance number {{ violation.instance }}. 
+                      <p *ngIf="(item.key.includes('mandatory activity') || item.key.includes('Prohibited activity')) && violation.instance != ''" class="text-xs text-gray-600 ml-5 leading-relaxed">
+                        In trace number {{ violation.case_id }}, this rule was violated on instance number {{ violation.instance }}. 
+                      </p>
+                      <p *ngIf="(item.key.includes('mandatory activity') || item.key.includes('Prohibited activity')) && violation.instance === ''" class="text-xs text-gray-600 ml-5 leading-relaxed">
+                        In trace number {{ violation.case_id }}, this rule was violated because an expected activity was not found in the log. 
                       </p>
                       <p *ngIf="item.key.includes('mandatory data')" class="text-xs text-gray-600 ml-5 leading-relaxed">
                         In trace number {{ violation.case_id }}, there was a mandatory data access that was not done on instance number {{ violation.instance }}. 

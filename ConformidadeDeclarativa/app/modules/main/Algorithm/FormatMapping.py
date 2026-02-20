@@ -6,9 +6,7 @@ from .LogStatistics import total_number_of_violations, success_rate
 import re
 
 def parse_constraint(rule: str):
-    print(rule)
-    
-    pattern = r"\[(.*?)\s+([crudCRUD]),\s+(.*?)(?:\s+(?:complete))?\]"
+    pattern = r"\[(.*?),\s*(.*?)\].*?T\.concept:operation\s+is\s+([crudCRUD])"
 
     match = re.search(pattern, rule)
 
@@ -16,11 +14,10 @@ def parse_constraint(rule: str):
         raise ValueError("Invalid rule")
 
     tool = match.group(1).strip()
-    operation = match.group(2).lower()
-    activity = match.group(3).strip()
+    operation = match.group(3).lower()
+    activity = match.group(2).strip()
 
     return activity, tool, operation
-
 
 
 def format_violations(df_violations):
@@ -30,7 +27,7 @@ def format_violations(df_violations):
     violations = []
     for index, row in df_violations.iterrows():
         for column in df_violations.columns:
-            if row[column] != [] and row[column] != None:
+            if row[column] != None:
                 violations.append([index, column, list(set([str(n) for n in row[column]]))])
     return violations
 
@@ -110,13 +107,14 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
             else:
                 patterns['Ignored mandatory data access'].append({'case_id': violation[0], 'tool': tool, 'activity': activity, 'operation': operation, 'instance': violation[2]})
     
+    #O Declare4Py não tem implementações das regras Succesion (e suas variantes) e CoExistence (e suas variantes)
     for violation in process_violations:
-        if any(regra in violation[1] for regra in ["Existence", "Response", "Init", "End", "AlternateResponse", "ChainResponse", "RespondedExistence", "Succession", "AlternateSuccession", "ChainSuccession", "CoExistence"]):
-            # Essas regras criam uma expectativa futura ou passada obrigatória.
-            patterns['Ignored mandatory activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': violation[2]})
-        elif any(regra in violation[1] for regra in ["Precedence", "Absense", "AlternatePrecedence", "ChainPrecedence", "NotSuccession", "NotChainSuccession", "NotCoExistence", "NotResponse", "NotRespondedExistence", "NotPrecedence", "NotChainResponse", "NotChainPrecedence" ]): 
+        if any(regra in violation[1] for regra in ["Precedence", "Absense", "Alternate Precedence", "Chain Precedence", "Not Succession", "Not Chain Succession", "Not CoExistence", "Not Response", "Not Responded Existence", "Not Precedence", "Not Chain Response", "Not Chain Precedence", "Exclusive Choice", "Exactly"]): 
             # Aqui, a ocorrência em si já é o problema se algo não ocorreu junto
-            patterns['Prohibited activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': violation[2]})
+            patterns['Prohibited activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2])})
+        elif any(regra in violation[1] for regra in ["Existence", "Response", "Init", "End", "Alternate Response", "Chain Response", "Responded Existence", "Succession", "Alternate Succession", "Chain Succession", "CoExistence", "Choice"]):
+            # Essas regras criam uma expectativa futura ou passada obrigatória.
+            patterns['Ignored mandatory activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2])})
         else:
             raise Exception("This rule is not supported")
         

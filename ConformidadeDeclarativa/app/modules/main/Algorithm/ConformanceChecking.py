@@ -1,4 +1,4 @@
-from .FormatMapping import format_violations
+from .FormatMapping import format_violations, format_violations_access, parse_constraint
 from Declare4Py.D4PyEventLog import D4PyEventLog
 import pm4py
 from Declare4Py.ProcessMiningTasks.ConformanceChecking.MPDeclareAnalyzer import MPDeclareAnalyzer
@@ -24,11 +24,11 @@ def check_access_conformance(process_model, log):
 
     basic_checker = MPDeclareAnalyzer(log=event_log, declare_model=process_model, consider_vacuity=True, track_violations='concept:instance')
     conf_check_res: MPDeclareResultsBrowser = basic_checker.run()
-    violations = format_violations(conf_check_res.get_metric(metric="events_violated"))
+    violations = format_violations_access(conf_check_res.get_metric(metric="events_violated"))
     size = sum(len(trace) for trace in event_log.get_log())
     return violations, size
 
-def check_resource_activities_conformance(process_log, access_log, allowed_activities_set, resource_model):
+def check_resource_activities_conformance(process_log, access_log, allowed_activities_set, resource_model, access_violations):
     '''
     Checks conformance between the access log, process log, and the resource model.
     
@@ -48,14 +48,19 @@ def check_resource_activities_conformance(process_log, access_log, allowed_activ
     activity_conformance = {}
     activity_conformance["UnexpectedActivity"] = []
     activity_conformance["UnexpectedDataAccess"] = []
+    mandatory_access = access_violations['Mandatory']
+    prohibited_access = access_violations['Prohibited']
+    optional_access = access_violations['Resource']
+    
+    optional_data = [parse_constraint(item[1]) for item in optional_access]
 
-    for index, row in resource_model.iterrows():
-        case_id = row['case:concept:name']
+    for _, row in resource_model.iterrows():
+        case_name = row['case:concept:name']
         resources = row['concept:resources'].split(", ")
-        activities = processed_process_log[processed_process_log['case:concept:name'] == case_id]
-        accesses = access_log[access_log['case:concept:name'] == case_id]
+        activities = processed_process_log[processed_process_log['case:concept:name'] == case_name]
+        accesses = access_log[access_log['case:concept:name'] == case_name]
 
-        for i, activity in activities.iterrows():
+        for _, activity in activities.iterrows():
             unexpected = False
             activity_resource = activity['concept:resource']
             activity_name = activity['concept:name']
@@ -66,15 +71,39 @@ def check_resource_activities_conformance(process_log, access_log, allowed_activ
             if activity_name not in allowed_activities_set:
                 unexpected = True
                 activity_conformance['UnexpectedActivity'].append([activity_name, activity['@@case_index'], activity['concept:instance'], activity_resource])
-
+                
+            instance_in_mandatory = [item for item in mandatory_access if activity['concept:instance'] in item[2]]
             activity_access = accesses[accesses['concept:instance']== activity['concept:instance']]
-            for j, acc in activity_access.iterrows():
+            for _, acc in activity_access.iterrows():
                 if unexpected:
                     activity_conformance['UnexpectedDataAccess'].append([acc['concept:tool'], acc['concept:operation'], activity['@@case_index'], acc['concept:instance'], acc['concept:resource'], activity_name])
-                if  activity_resource != acc['concept:resource']:
-                    violations["IllegalResourceAccess"].append([acc['concept:tool'], activity['concept:name'], activity['@@case_index'], acc['concept:resource'], activity_resource, acc['concept:instance'], acc['concept:operation']])
-                if acc['concept:resource'] not in resources:
-                    violations["IllegalTeamAccess"].append([acc['concept:tool'], activity['concept:name'], activity['@@case_index'], acc['concept:resource'], acc['concept:instance'], acc['concept:operation']])
 
-    return violations, activity_conformance
-            
+                verified_violations = []
+                for violation in instance_in_mandatory:
+                    _, tool, op = parse_constraint(violation[1])
+                    elements = [tool, op]
+                    if acc['concept:tool'] in elements and acc['concept:operation'].lower() in elements:
+                        verified_violations.append(instance_in_mandatory.index(violation))
+                        if 'Precedence' in violation[1]:
+                            violation.extend([acc['concept:resource'], activity_resource])
+                            access_violations['Resource'].append(violation)
+                            access_violations['Mandatory'].remove(violation)
+                        else:
+                            access_violations['Mandatory'].remove(violation)
+                instance_in_mandatory = [i for i in instance_in_mandatory if instance_in_mandatory.index(i) not in verified_violations]
+                            
+                instance_in_prohibited = [item for item in prohibited_access if activity['concept:instance'] in item[2] and 'Precedence' in item[1] and acc['concept:tool'] in parse_constraint(item[1])[1] and acc['concept:operation'].lower() in parse_constraint(item[1])[2]]
+                
+                for violation in instance_in_prohibited:
+                    if acc['concept:resource'] != activity_resource:
+                        violation.extend([acc['concept:resource'], activity_resource])
+                        access_violations['Resource'].append(violation)
+                        
+                optional_indexes = [i for i, t in enumerate(optional_data) if set(t) == set((acc['concept:tool'], acc['concept:operation'].lower(), activity_name))]
+
+                for i in optional_indexes:
+                    access_violations['Resource'][i].extend([acc['concept:resource'], activity_resource])
+                
+                if acc['concept:resource'] not in resources:
+                    violations["IllegalTeamAccess"].append([acc['concept:tool'], activity_name, activity['@@case_index'], acc['concept:resource'], acc['concept:instance'], acc['concept:operation']])
+    return violations, activity_conformance, access_violations

@@ -18,17 +18,22 @@ def check_letters(cell, model, access, activity):
         if uppercase_present:
             if f'{access}\n' not in model:
                 model += 'activity ' + f'{access}\n'
-            model += f'Precedence[{access}, {activity}] |A.lifecycle:transition is complete |same concept:instance AND T.concept:operation is {letter} |\n'
-            model += f'Response[{activity}, {access}] |A.lifecycle:transition is begin |same concept:instance AND T.concept:operation is {letter} |\n'
+            model += f'Precedence[{access}, {activity}] |A.lifecycle:transition is complete |same concept:instance and same concept:resource AND T.concept:operation is {letter} |\n'
+            model += f'Response[{activity}, {access}] |A.lifecycle:transition is begin |same concept:instance and same concept:resource AND T.concept:operation is {letter} |\n'
 
-        if letter not in cell and not uppercase_present:
+        if not uppercase_present and letter not in cell:
             if f'{access}\n' not in model:
                 model += 'activity ' + f'{access}\n'
-            model += f'NotPrecedence[{access}, {activity}] |A.lifecycle:transition is complete |same concept:instance AND T.concept:operation is {letter} |\n'
-            model += f'NotResponse[{activity}, {access}] |A.lifecycle:transition is begin |same concept:instance AND T.concept:operation is {letter} |\n'
-        
-        # model += f'CoExistence[{activity}, {access}] |A.lifecycle:transition is begin |same concept:instance and same concept:resource AND T.concept:operation is {letter} |\n'
-
+            model += f'NotPrecedence[{access}, {activity}] |A.lifecycle:transition is complete |same concept:instance AND T.concept:operation is {letter} AND (same concept:resource OR different concept:resource) |\n'
+            model += f'NotResponse[{activity}, {access}] |A.lifecycle:transition is begin |same concept:instance AND T.concept:operation is {letter} AND (same concept:resource OR different concept:resource) |\n'
+            
+        if not uppercase_present and letter in cell:
+            if f'{access}\n' not in model:
+                model += 'activity ' + f'{access}\n'
+            model += f'Precedence[{access}, {activity}] |A.lifecycle:transition is complete |same concept:instance and same concept:resource AND T.concept:operation is {letter} |\n'
+            model += f'Response[{activity}, {access}] |A.lifecycle:transition is begin |same concept:instance and same concept:resource AND T.concept:operation is {letter} |\n'
+            model += f'NotPrecedence[{access}, {activity}] |A.lifecycle:transition is complete |same concept:instance AND T.concept:operation is {letter} AND different concept:resource |\n'
+            model += f'NotResponse[{activity}, {access}] |A.lifecycle:transition is begin |same concept:instance AND T.concept:operation is {letter} AND different concept:resource |\n'
 
     return model
 

@@ -8,13 +8,6 @@ from xml.etree import ElementTree as ET
 from datetime import datetime
 import re
 import tempfile
-from werkzeug.datastructures import FileStorage
-from pm4py.objects.log.importer.xes import importer as xes_importer
-
-import pm4py
-import pandas as pd
-from pm4py.objects.log.util import dataframe_utils
-import tempfile
 
 def normalize_xes_timestamps_to_tempfile(xes_path: str) -> str: 
     tree = ET.parse(xes_path)
@@ -26,28 +19,22 @@ def normalize_xes_timestamps_to_tempfile(xes_path: str) -> str:
         if not value:
             continue
 
-        # separa timezone (Z ou +hh:mm)
         tz_match = re.search(r"(Z|[+-]\d{2}:\d{2})$", value)
         tz = tz_match.group(1) if tz_match else "+00:00"
 
-        # remove timezone temporariamente
         value_no_tz = re.sub(r"(Z|[+-]\d{2}:\d{2})$", "", value)
 
-        # corta fração para no máximo 6 dígitos
         value_no_tz = re.sub(
             r"\.(\d{6})\d+",
             r".\1",
             value_no_tz
         )
 
-        # se não tiver fração, adiciona .000000
         if "." not in value_no_tz:
             value_no_tz += ".000000"
 
-        # valida
         dt = datetime.strptime(value_no_tz, "%Y-%m-%dT%H:%M:%S.%f")
 
-        # reconstroi com timezone
         date_elem.attrib["value"] = dt.strftime("%Y-%m-%dT%H:%M:%S.%f") + tz
 
     tmp = tempfile.NamedTemporaryFile(

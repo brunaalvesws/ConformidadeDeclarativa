@@ -1,7 +1,5 @@
-
-
 from .LogStatistics import total_number_of_violations, success_rate
-
+from collections import defaultdict
 
 import re
 
@@ -11,13 +9,14 @@ def parse_constraint(rule: str):
     match = re.search(pattern, rule)
 
     if not match:
-        raise ValueError("Invalid rule")
+        raise ValueError(f"Invalid rule: {rule}")
 
     tool = match.group(1).strip()
     operation = match.group(3).lower()
     activity = match.group(2).strip()
 
     return activity, tool, operation
+
 
 
 def format_violations(df_violations):
@@ -29,6 +28,73 @@ def format_violations(df_violations):
         for column in df_violations.columns:
             if row[column] != None:
                 violations.append([index, column, list(set([str(n) for n in row[column]]))])
+    return violations
+
+
+def format_violations_access(df_violations):
+    '''
+    Formats the violations detected by Declare4Py conformance checking for access perspective.
+    '''
+    violations = {}
+    violations['Resource'] = []
+    violations['Mandatory'] = []
+    violations['Prohibited'] = []
+
+    grouped_columns = defaultdict(list)
+
+    for col in df_violations.columns:
+        A,T,O = parse_constraint(col)
+        grouped_columns[tuple(sorted([A,T,O]))].append(col)
+
+    optional_resources_rules = {
+        chave: cols
+        for chave, cols in grouped_columns.items()
+        if len(cols) >= 4
+    }
+
+    for row_index, row in df_violations.iterrows():
+
+        verified_rules = []
+
+        for columns in optional_resources_rules.values():
+
+            values = row[columns]
+            valid_values = values[values.notna()].index.tolist()
+            if len(valid_values) >= 4:
+                
+                lists = [row[col] for col in valid_values[:4]]
+
+                if all(isinstance(l, list) for l in lists):
+                    intersection = set(lists[0])
+
+                    for l in lists[1:]:
+                        intersection &= set(l)
+                        
+                    for i in intersection:
+                        
+                        violations['Resource'].append([
+                            row_index,
+                            columns[0],
+                            i
+                        ])
+              
+            verified_rules.extend(columns) 
+            
+        for column_name, value in row.items():
+            if (value is not None and column_name not in verified_rules):
+                if 'Not' in column_name:
+                    violations['Prohibited'].append([
+                        row_index,
+                        column_name,
+                        value
+                    ])
+                else:
+                    violations['Mandatory'].append([
+                        row_index,
+                        column_name,
+                        value
+                    ])
+        
     return violations
 
 
@@ -96,23 +162,26 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
     for acc in resource_violations['IllegalTeamAccess']:
         patterns['Illegal data access'].append({'tool': acc[0], 'activity': acc[1], 'case_id': acc[2], 'instance': acc[4], 'resource': acc[3], 'operation': acc[5]})
     
-    for acc in resource_violations['IllegalResourceAccess']:
-        patterns['Illegal data access'].append({'tool': acc[0], 'activity': acc[1], 'case_id': acc[2], 'instance': acc[5], 'resource': acc[3], 'designated_resource': acc[4], 'operation': acc[6]})
+    for violation in access_violations['Resource']:
+        activity, tool, operation = parse_constraint(violation[1])
+        patterns['Illegal data access'].append({'case_id': violation[0], 'tool': tool, 'activity': activity, 'operation': operation, 'instance': violation[2], 'resource': violation[3], 'designated_resource': violation[4]})
     
-    for violation in access_violations:
+    for violation in access_violations['Mandatory']:
         if 'Precedence' in violation[1]:
             activity, tool, operation = parse_constraint(violation[1])
-            if "Not" in violation[1]:
-                patterns['Prohibited data access'].append({'case_id': violation[0], 'tool': tool, 'activity': activity, 'operation': operation, 'instance': violation[2]})
-            else:
-                patterns['Ignored mandatory data access'].append({'case_id': violation[0], 'tool': tool, 'activity': activity, 'operation': operation, 'instance': violation[2]})
+            patterns['Ignored mandatory data access'].append({'case_id': violation[0], 'tool': tool, 'activity': activity, 'operation': operation, 'instance': violation[2]})
+    
+    for violation in access_violations['Prohibited']:
+        if "Precedence" in violation[1]:
+            activity, tool, operation = parse_constraint(violation[1])
+            patterns['Prohibited data access'].append({'case_id': violation[0], 'tool': tool, 'activity': activity, 'operation': operation, 'instance': violation[2]})
     
     #O Declare4Py não tem implementações das regras Succesion (e suas variantes) e CoExistence (e suas variantes)
     for violation in process_violations:
-        if any(regra in violation[1] for regra in ["Precedence", "Absense", "Alternate Precedence", "Chain Precedence", "Not Succession", "Not Chain Succession", "Not CoExistence", "Not Response", "Not Responded Existence", "Not Precedence", "Not Chain Response", "Not Chain Precedence", "Exclusive Choice", "Exactly"]): 
+        if any(regra in violation[1] for regra in ["Precedence", "Absense", "Not Succession", "Not Chain Succession", "Not CoExistence", "Not Response", "Not Responded Existence", "Not Chain Response", "Exclusive Choice", "Exactly"]): 
             # Aqui, a ocorrência em si já é o problema se algo não ocorreu junto
             patterns['Prohibited activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2])})
-        elif any(regra in violation[1] for regra in ["Existence", "Response", "Init", "End", "Alternate Response", "Chain Response", "Responded Existence", "Succession", "Alternate Succession", "Chain Succession", "CoExistence", "Choice"]):
+        elif any(regra in violation[1] for regra in ["Existence", "Response", "Init", "End", "Chain Response", "Succession", "CoExistence", "Choice"]):
             # Essas regras criam uma expectativa futura ou passada obrigatória.
             patterns['Ignored mandatory activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2])})
         else:
@@ -129,4 +198,3 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
     report['violations'] = patterns
     print(report)    
     return report
-            

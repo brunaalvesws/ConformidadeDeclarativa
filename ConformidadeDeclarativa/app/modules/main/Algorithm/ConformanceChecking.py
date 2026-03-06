@@ -37,9 +37,7 @@ def check_resource_activities_conformance(process_log, access_log, allowed_activ
     Accepts a process log (EventLog object), access log (DataFrame), access violations (DataFrame), set of allowed activities and a Resource Model (DataFrame).
     '''
 
-    process_log_df = pm4py.convert_to_dataframe(process_log.get_log())
-    process_log_df = process_log_df.sort_values(['case:concept:name', 'concept:instance'])
-    processed_process_log = process_log_df[process_log_df["lifecycle:transition"] == "begin"]
+    processed_process_log = process_log[process_log["lifecycle:transition"] == "begin"]
 
     violations = {}
     violations["IllegalTeamAccess"] = []

@@ -59,10 +59,11 @@ def convert_logs(process_log, access_log):
     '''
     process_log_df = pm4py.convert_to_dataframe(process_log.get_log())
     process_log_df = process_log_df.sort_values(['case:concept:name', 'concept:instance'])
-    process_log_df['concept:operation'] = 'A'
+    merged_log = process_log_df.copy()
+    merged_log['concept:operation'] = 'A'
 
     for index, row in access_log.iterrows():
-        process_log_df.loc[len(process_log_df)] = [row['concept:tool'],row['lifecycle:transition'], row['time:timestamp'], row['concept:resource'], row['concept:instance'], len(process_log_df), row['@@case_index'], row['case:concept:name'],row['concept:operation'].lower()]
-    process_log_df = process_log_df.sort_values(['case:concept:name', 'concept:instance','time:timestamp'])
-    process_log_df.to_csv('LogConjuntoTeste.csv')
-    return pm4py.convert_to_event_log(process_log_df)
+        merged_log.loc[len(merged_log)] = [row['concept:tool'],row['lifecycle:transition'], row['time:timestamp'], row['concept:resource'], row['concept:instance'], len(merged_log), row['@@case_index'], row['case:concept:name'],row['concept:operation'].lower()]
+    merged_log = merged_log.sort_values(['case:concept:name', 'concept:instance','time:timestamp'])
+    merged_log.to_csv('LogConjuntoTeste.csv')
+    return pm4py.convert_to_event_log(merged_log), process_log_df

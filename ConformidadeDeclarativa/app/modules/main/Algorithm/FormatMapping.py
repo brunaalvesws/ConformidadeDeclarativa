@@ -17,6 +17,11 @@ def parse_constraint(rule: str):
 
     return activity, tool, operation
 
+def parse_activities(rule:str):
+
+    matches = re.findall(r"\[([^\[\]]+)\]", rule)
+
+    return matches[0].split(', ')
 
 
 def format_violations(df_violations):
@@ -139,7 +144,7 @@ def format_inconformances(process_conformance, access_conformance, resource_conf
 
     return report
 
-def non_conformance_patterns_mapping(process_violations, access_violations, resource_violations, unexpected_activities, activities_stats, log_size, duration):
+def non_conformance_patterns_mapping(process_violations, access_violations, resource_violations, unexpected_activities, activities_stats, log_size, duration, process_log):
     patterns = {}
     patterns['Prohibited activity'] = [] #1.5, 2.5, 3.5, 4.5, 5.5, 6.5
     patterns['Unexpected activity'] = [] #7.7
@@ -177,13 +182,23 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
             patterns['Prohibited data access'].append({'case_id': violation[0], 'tool': tool, 'activity': activity, 'operation': operation, 'instance': violation[2]})
     
     #O Declare4Py não tem implementações das regras Succesion (e suas variantes) e CoExistence (e suas variantes)
+    
+    process_log = process_log[process_log["lifecycle:transition"] == "begin"]
+    process_log = process_log.set_index("concept:instance")
     for violation in process_violations:
+        ids = [int(i) for i in violation[2]]
+        if ids == []:
+            names = parse_activities(violation[1])
+            resources = []
+        else:
+            names = process_log.loc[ids, "concept:name"].tolist()
+            resources = process_log.loc[ids, "concept:resource"].tolist()
         if any(regra in violation[1] for regra in ["Precedence", "Absense", "Not Succession", "Not Chain Succession", "Not CoExistence", "Not Response", "Not Responded Existence", "Not Chain Response", "Exclusive Choice", "Exactly"]): 
             # Aqui, a ocorrência em si já é o problema se algo não ocorreu junto
-            patterns['Prohibited activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2])})
+            patterns['Prohibited activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2]), 'name': names, 'resource': resources})
         elif any(regra in violation[1] for regra in ["Existence", "Response", "Init", "End", "Chain Response", "Succession", "CoExistence", "Choice"]):
             # Essas regras criam uma expectativa futura ou passada obrigatória.
-            patterns['Ignored mandatory activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2])})
+            patterns['Ignored mandatory activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2]), 'name': names, 'resource': resources})
         else:
             raise Exception("This rule is not supported")
         

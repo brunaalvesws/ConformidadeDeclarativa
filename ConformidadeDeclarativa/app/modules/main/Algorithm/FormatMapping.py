@@ -193,7 +193,7 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
         else:
             names = process_log.loc[ids, "concept:name"].tolist()
             resources = process_log.loc[ids, "concept:resource"].tolist()
-        if any(regra in violation[1] for regra in ["Precedence", "Absense", "Not Succession", "Not Chain Succession", "Not CoExistence", "Not Response", "Not Responded Existence", "Not Chain Response", "Exclusive Choice", "Exactly"]): 
+        if any(regra in violation[1] for regra in ["Precedence", "Absence", "Not Succession", "Not Chain Succession", "Not CoExistence", "Not Response", "Not Responded Existence", "Not Chain Response", "Exclusive Choice", "Exactly"]): 
             # Aqui, a ocorrência em si já é o problema se algo não ocorreu junto
             patterns['Prohibited activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2]), 'activity': names, 'resource': resources})
         elif any(regra in violation[1] for regra in ["Existence", "Response", "Init", "End", "Chain Response", "Succession", "CoExistence", "Choice"]):

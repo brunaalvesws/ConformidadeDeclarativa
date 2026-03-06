@@ -156,13 +156,13 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
     patterns['Ignored mandatory data access'] = [] #2.1, 2.3, 2.5
     
     for act in unexpected_activities['UnexpectedActivity']:
-        patterns['Unexpected activity'].append({'name': act[0], 'case_id': act[1], 'instance': act[2], 'resource': act[3]})
+        patterns['Unexpected activity'].append({'activity': act[0], 'case_id': act[1], 'instance': act[2], 'resource': act[3]})
         
     for acc in unexpected_activities['UnexpectedDataAccess']:
         patterns['Unexpected data access'].append({'tool': acc[0], 'operation': acc[1], 'case_id': acc[2], 'instance': acc[3], 'resource': acc[4], 'activity': acc[5]})
         
     for act in resource_violations['IllegalTeamActivity']:
-        patterns['Illegal activity'].append({'name': act[0], 'case_id': act[1], 'resource': act[2], 'instance': act[3]})
+        patterns['Illegal activity'].append({'activity': act[0], 'case_id': act[1], 'resource': act[2], 'instance': act[3]})
         
     for acc in resource_violations['IllegalTeamAccess']:
         patterns['Illegal data access'].append({'tool': acc[0], 'activity': acc[1], 'case_id': acc[2], 'instance': acc[4], 'resource': acc[3], 'operation': acc[5]})
@@ -195,10 +195,10 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
             resources = process_log.loc[ids, "concept:resource"].tolist()
         if any(regra in violation[1] for regra in ["Precedence", "Absense", "Not Succession", "Not Chain Succession", "Not CoExistence", "Not Response", "Not Responded Existence", "Not Chain Response", "Exclusive Choice", "Exactly"]): 
             # Aqui, a ocorrência em si já é o problema se algo não ocorreu junto
-            patterns['Prohibited activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2]), 'name': names, 'resource': resources})
+            patterns['Prohibited activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2]), 'activity': names, 'resource': resources})
         elif any(regra in violation[1] for regra in ["Existence", "Response", "Init", "End", "Chain Response", "Succession", "CoExistence", "Choice"]):
             # Essas regras criam uma expectativa futura ou passada obrigatória.
-            patterns['Ignored mandatory activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2]), 'name': names, 'resource': resources})
+            patterns['Ignored mandatory activity'].append({'case_id': violation[0], 'rule': violation[1], 'instance': ", ".join(violation[2]), 'activity': names, 'resource': resources})
         else:
             raise Exception("This rule is not supported")
         

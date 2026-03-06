@@ -8,7 +8,6 @@ export interface Violation {
   case_id: string;      
   rule: string; 
   instance: string | string[];
-  name: string;
   tool: string;
   resource: string;
   activity: string;

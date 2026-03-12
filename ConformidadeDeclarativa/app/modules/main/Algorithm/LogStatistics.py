@@ -8,5 +8,5 @@ def total_number_of_violations(violations):
      return sum(len(lista) for lista in violations.values())
  
 
-def success_rate(num_eventos, violations):
-    return (num_eventos - violations) * 100 / num_eventos
+def success_rate(num_events, violations):
+    return (num_events - violations) * 100 / num_events

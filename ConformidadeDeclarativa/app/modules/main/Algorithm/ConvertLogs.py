@@ -2,6 +2,19 @@
 from Declare4Py.ProcessModels.DeclareModel import DeclareModel
 import pm4py
 
+'''
+ About this implementation:
+ The Multi-perspective conformance checking algorithm paper/thesis states about the Between rule, a new DECLARE template
+ to enhance the idea of an activity that must occur after another and before a second one, so, between them. 
+ A formal definition was given but the rule was not implemented yet, since Declare4Py has no support for ternary rules.
+ As future work, is expected that this contribution will be done on Declare4Py or at least use the library as a solid basis.
+ Until them, Response and Precedence rules were used together to model the idea of Between. Since this context uses
+ activities with begin and complete time, we can be sure that the begin's event of an activity is always happening before the 
+ complete's event of the activity, and so we can say that Response[activity(begin), access] and Precendence[access, activity(complete)]
+ work for expressing Between's definition.
+'''
+
+
 
 def check_letters(cell, model, access, activity):
     """Checks which letters (c, r, u, d) are present in the cell, distinguishing between uppercase and lowercase."""
@@ -50,7 +63,7 @@ def convert_model_to_rules(access_model, process_model):
             new_model = check_letters(value, new_model, access_model.iloc[index,0], col)
 
     declare_model = DeclareModel().parse_from_string(new_model)
-    declare_model.to_file('ModeloConjuntoTeste.decl')
+    #declare_model.to_file('ModeloConjuntoTeste.decl') -- only to test
     return declare_model
 
 def convert_logs(process_log, access_log):
@@ -65,5 +78,5 @@ def convert_logs(process_log, access_log):
     for index, row in access_log.iterrows():
         merged_log.loc[len(merged_log)] = [row['concept:tool'],row['lifecycle:transition'], row['time:timestamp'], row['concept:resource'], row['concept:instance'], len(merged_log), row['@@case_index'], row['case:concept:name'],row['concept:operation'].lower()]
     merged_log = merged_log.sort_values(['case:concept:name', 'concept:instance','time:timestamp'])
-    merged_log.to_csv('LogConjuntoTeste.csv')
+    #merged_log.to_csv('LogConjuntoTeste.csv') -- only to test
     return pm4py.convert_to_event_log(merged_log), process_log_df

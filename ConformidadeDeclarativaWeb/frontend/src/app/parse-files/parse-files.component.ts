@@ -85,6 +85,7 @@ export class ParseFilesComponent implements OnInit{
   startAlgorithm() {
     const formData = new FormData();
     if (this.arquivoDeclare != null && this.arquivoOrganizacional != null && this.arquivoAcesso != null && this.arquivoLogEventos != null && this.arquivoLogAcesso != null) {
+      this.loading = true;
       formData.append('declare', this.arquivoDeclare!); 
       formData.append('organizational', this.arquivoOrganizacional!); 
       formData.append('access', this.arquivoAcesso!); 

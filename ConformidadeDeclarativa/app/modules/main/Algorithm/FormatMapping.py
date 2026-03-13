@@ -58,11 +58,8 @@ def format_violations_access(df_violations):
     }
 
     for row_index, row in df_violations.iterrows():
-
         verified_rules = []
-
         for columns in optional_resources_rules.values():
-
             values = row[columns]
             valid_values = values[values.notna()].index.tolist()
             if len(valid_values) >= 4:
@@ -76,7 +73,6 @@ def format_violations_access(df_violations):
                         intersection &= set(l)
                         
                     for i in intersection:
-                        
                         violations['Resource'].append([
                             row_index,
                             columns[0],
@@ -84,7 +80,6 @@ def format_violations_access(df_violations):
                         ])
               
             verified_rules.extend(columns) 
-            
         for column_name, value in row.items():
             if (value is not None and column_name not in verified_rules):
                 if 'Not' in column_name:
@@ -99,7 +94,6 @@ def format_violations_access(df_violations):
                         column_name,
                         value
                     ])
-        
     return violations
 
 
@@ -211,5 +205,5 @@ def non_conformance_patterns_mapping(process_violations, access_violations, reso
     }
     report['activityDistribution'] = activities_stats
     report['violations'] = patterns
-    print(report)    
+    #print(report) -- only for backend tests   
     return report

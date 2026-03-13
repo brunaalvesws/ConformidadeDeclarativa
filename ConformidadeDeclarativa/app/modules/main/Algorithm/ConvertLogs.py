@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from Declare4Py.ProcessModels.DeclareModel import DeclareModel
 import pm4py
+import pandas as pd
 
 '''
  About this implementation:
@@ -72,11 +73,12 @@ def convert_logs(process_log, access_log):
     '''
     process_log_df = pm4py.convert_to_dataframe(process_log.get_log())
     process_log_df = process_log_df.sort_values(['case:concept:name', 'concept:instance'])
-    merged_log = process_log_df.copy()
-    merged_log['concept:operation'] = 'A'
+    process_log_df['concept:operation'] = 'A'
 
-    for index, row in access_log.iterrows():
-        merged_log.loc[len(merged_log)] = [row['concept:tool'],row['lifecycle:transition'], row['time:timestamp'], row['concept:resource'], row['concept:instance'], len(merged_log), row['@@case_index'], row['case:concept:name'],row['concept:operation'].lower()]
-    merged_log = merged_log.sort_values(['case:concept:name', 'concept:instance','time:timestamp'])
-    #merged_log.to_csv('LogConjuntoTeste.csv') -- only to test
-    return pm4py.convert_to_event_log(merged_log), process_log_df
+    access_log['concept:operation'] = access_log['concept:operation'].str.lower()
+
+    df_merged = pd.concat([process_log_df, access_log], ignore_index=True)
+    
+    df_merged = df_merged.sort_values(['case:concept:name', 'concept:instance','time:timestamp'])
+    #df_merged.to_csv('LogConjuntoTeste.csv') -- only to test
+    return pm4py.convert_to_event_log(df_merged), process_log_df

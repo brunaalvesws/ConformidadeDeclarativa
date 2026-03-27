@@ -92,7 +92,7 @@ export class ReportComponent implements OnInit {
             finalOperation = formattedOperation;
           }
 
-          const line = `"${activity}","${resource}","${finalTool}","${finalOperation}","${category}","${instances}`;
+          const line = `"${activity}","${resource}","${finalTool}","${finalOperation}","${category}","${instances[i]}"`;
           rows.push(line);
         }
       }

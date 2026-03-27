@@ -55,7 +55,7 @@ export class ReportComponent implements OnInit {
     if (!this.resultado) return;
 
     const rows: string[] = [];
-    rows.push("Activity,Resource,Data Object,Operation,Category");
+    rows.push("Activity,Resource,Data Object,Operation,Category,Instances");
 
     for (const category in this.resultado.violations) {
       const violations = this.resultado.violations[category];
@@ -66,9 +66,7 @@ export class ReportComponent implements OnInit {
 
         const instances = Array.isArray(v.instance)
           ? v.instance
-          : (typeof v.instance === "string"
-              ? v.instance.split(",").map(i => i.trim())
-              : [""]);
+          : (typeof v.instance === "string" ? v.instance.split(",").map(i => i.trim()) : [""]);
 
         const activities = Array.isArray(v.activity)
           ? v.activity
@@ -79,9 +77,7 @@ export class ReportComponent implements OnInit {
           : (typeof v.resource === "string" ? v.resource.split(",").map(r => r.trim()) : [""]);
 
         const tool = v.tool ?? "";
-        const formattedOperation = v.operation
-          ? this.formatOperation(v.operation)
-          : "";
+        const formattedOperation = v.operation ? this.formatOperation(v.operation) : "";
 
         for (let i = 0; i < instances.length; i++) {
 
@@ -96,7 +92,7 @@ export class ReportComponent implements OnInit {
             finalOperation = formattedOperation;
           }
 
-          const line = `"${activity}","${resource}","${finalTool}","${finalOperation}","${category}"`;
+          const line = `"${activity}","${resource}","${finalTool}","${finalOperation}","${category}","${instances}`;
           rows.push(line);
         }
       }

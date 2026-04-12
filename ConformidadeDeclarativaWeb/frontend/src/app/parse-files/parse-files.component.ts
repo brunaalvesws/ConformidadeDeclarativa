@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
-import { ProcessamentoService } from '../services/processamento.service';
+import { ServiceProcessing } from '../services/processamento.service';
 import { Router } from '@angular/router';
 import { ReportDTO } from '../models/report.dto';
 
@@ -27,7 +27,7 @@ export class ParseFilesComponent implements OnInit{
   loading = false
 
   constructor(
-    private service: ProcessamentoService,
+    private service: ServiceProcessing,
     private router: Router
   ) {
   }
@@ -92,9 +92,9 @@ export class ParseFilesComponent implements OnInit{
       formData.append('accessLog', this.arquivoLogAcesso!); 
       formData.append('eventLog', this.arquivoLogEventos!); 
 
-      this.service.processarArquivos(formData).subscribe({
+      this.service.processFiles(formData).subscribe({
         next: (resultado: ApiResponse) => {
-          this.service.setResultado(resultado.data);
+          this.service.setResult(resultado.data);
           this.router.navigate(['/report']);
         },
         error: (err: any) => {

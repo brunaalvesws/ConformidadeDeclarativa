@@ -43,7 +43,7 @@ export const NON_CONFORMANCE_CATEGORY_DESCRIPTIONS: Record<string, string> = {
 export class ReportComponent implements OnInit {
 
   result: ReportDTO | null = null; 
-  dategeneration: Date = new Date(); 
+  generationDate: Date = new Date(); 
 
   constructor(private service: ServiceProcessing) {}
 

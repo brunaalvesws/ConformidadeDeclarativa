@@ -23,13 +23,14 @@ def MultiperspectiveConformanceAlgorithm(eventPATH=str(Path(__file__).resolve().
                                                                                                               declarePATH, 
                                                                                                               accessmodelPATH)
   processed_access_model = convert_model_to_rules(access_model, process_model)
-  process_conformance = check_process_conformance(process_model, process_log, consider_vacuity)
+  process_conformance, plog_size = check_process_conformance(process_model, process_log, consider_vacuity)
   complete_log, process_log_df = convert_logs(process_log, access_log)
   activities_stats = activities_distribution(process_log)
-  access_conformance, log_size = check_access_conformance(processed_access_model, complete_log)
+  access_conformance, alog_size = check_access_conformance(processed_access_model, complete_log)
   resource_conformance, activity_conformance, access_violations = check_resource_activities_conformance(process_log_df, access_log, allowed_activities, resource_model, access_conformance)
   end = time.time()
   duration = end - begin
+  log_size = (plog_size // 2)  + alog_size
   return non_conformance_patterns_mapping(process_conformance, 
                                           access_violations, 
                                           resource_conformance, 

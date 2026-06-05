@@ -8,21 +8,21 @@ interface ApiResponse {
 }
 
 @Injectable({ providedIn: 'root' })
-export class ProcessamentoService {
+export class ServiceProcessing {
 
-  private resultado!: ReportDTO;
+  private result!: ReportDTO;
 
   constructor(private http: HttpClient) {}
 
-  processarArquivos(files: FormData) {
+  processFiles(files: FormData) {
     return this.http.post<ApiResponse>(`${environment.apiUrl}/check`, files);
   }
 
-  setResultado(resultado: ReportDTO) {
-    this.resultado = resultado;
+  setResult(result: ReportDTO) {
+    this.result = result;
   }
 
-  getResultado(): ReportDTO {
-    return this.resultado;
+  getResult(): ReportDTO {
+    return this.result;
   }
 }

@@ -1,6 +1,6 @@
 <div class="flex flex-col items-center w-full min-h-screen p-4">
   <div
-    *ngIf="!resultado"
+    *ngIf="!result"
     class="flex flex-col items-center justify-center mt-20 text-center">
     <div
       class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mb-4"></div>
@@ -8,7 +8,7 @@
   </div>
 
   <div
-    *ngIf="resultado"
+    *ngIf="result"
     class="w-full max-w-4xl mt-6 mb-8 text-center animate-fade-in">
     <h1
       class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl mb-2">
@@ -20,7 +20,7 @@
   </div>
 
   <div
-    *ngIf="resultado"
+    *ngIf="result"
     class="w-full max-w-4xl bg-white shadow-xl rounded-xl border border-gray-200 overflow-hidden transition-all duration-200">
     <div
       class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center bg-white gap-4">
@@ -30,7 +30,7 @@
           Report
         </h2>
         <p class="text-xs text-gray-400 ml-8 mt-0.5">
-          Generated on {{ dataGeracao | date: "dd MMM yyyy, HH:mm" }}
+          Generated on {{ generationDate | date: "dd MMM yyyy, HH:mm" }}
         </p>
       </div>
 
@@ -43,10 +43,10 @@
         </button>
 
         <button
-          (click)="onRegenerate()"
-          class="flex-1 sm:flex-none inline-flex justify-center items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
-          <span class="material-icons-round text-sm mr-2">refresh</span>
-          Regenerate
+          (click)="onExportPDF()"
+          class="flex-1 sm:flex-none inline-flex justify-center items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors">
+          <span class="material-icons-round text-sm mr-2">file_download</span>
+          Export PDF
         </button>
       </div>
     </div>
@@ -78,12 +78,12 @@
 
               <span
                 [class]="
-                  resultado.overview.successRate > 90
+                  result.overview.successRate > 90
                     ? 'bg-green-100 text-green-800'
                     : 'bg-yellow-100 text-yellow-800'
                 "
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide">
-                {{ resultado.overview.successRate.toFixed(2) }}% Success
+                {{ result.overview.successRate.toFixed(2) }}% Success
               </span>
             </div>
           </summary>
@@ -98,7 +98,7 @@
               </div>
               <span
                 class="text-xs font-mono text-gray-500 bg-gray-50 px-2 py-1 rounded">{{
-                formatDuration(resultado.overview.averageDuration) }}</span>
+                formatDuration(result.overview.averageDuration) }}</span>
             </div>
 
             <details class="group">
@@ -113,7 +113,7 @@
               <div class="ml-6 mt-1 space-y-1">
                 <ng-container
                   *ngFor="
-                    let activity of resultado.activityDistribution | keyvalue
+                    let activity of result.activityDistribution | keyvalue
                   ">
                   <div class="flex justify-between text-xs py-1 px-2">
                     <span
@@ -153,13 +153,13 @@
               </div>
               <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-red-100 text-red-800">
-                {{ resultado.overview.violationCount }} Violations
+                {{ result.overview.violationCount }} Violations
               </span>
             </div>
           </summary>
 
           <div class="ml-10 mt-3 pl-6 border-l-2 border-gray-100">
-            <ng-container *ngFor="let item of resultado.violations | keyvalue">
+            <ng-container *ngFor="let item of result.violations | keyvalue">
               <details class="group mb-3">
                 <summary
                   class="flex items-center cursor-pointer list-none py-2 px-2 rounded-lg hover:bg-red-50/50 transition-colors border border-transparent hover:border-red-100">

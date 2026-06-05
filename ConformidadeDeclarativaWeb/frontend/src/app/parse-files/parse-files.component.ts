@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgModel } from '@angular/forms';
-import { ProcessamentoService } from '../services/processamento.service';
+import { ServiceProcessing } from '../services/processamento.service';
 import { Router } from '@angular/router';
 import { ReportDTO } from '../models/report.dto';
 
@@ -19,15 +19,15 @@ interface ApiResponse {
 })
 export class ParseFilesComponent implements OnInit{
   declareModel = ''
-  arquivoDeclare: File | null = null;
-  arquivoAcesso: File | null = null;
-  arquivoOrganizacional: File | null = null;
-  arquivoLogEventos: File | null = null;
-  arquivoLogAcesso: File | null = null;
+  declareFile: File | null = null;
+  accessFile: File | null = null;
+  organizationalFile: File | null = null;
+  eventLogFile: File | null = null;
+  accessLogFile: File | null = null;
   loading = false
 
   constructor(
-    private service: ProcessamentoService,
+    private service: ServiceProcessing,
     private router: Router
   ) {
   }
@@ -38,7 +38,7 @@ export class ParseFilesComponent implements OnInit{
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (file) {
-      this.arquivoDeclare = file;
+      this.declareFile = file;
     }
   }
 
@@ -51,7 +51,7 @@ export class ParseFilesComponent implements OnInit{
     const file = input.files?.[0];
     if (file) {
       const reader = new FileReader();
-      this.arquivoOrganizacional = file;
+      this.organizationalFile = file;
     }
   }
 
@@ -60,7 +60,7 @@ export class ParseFilesComponent implements OnInit{
     const file = input.files?.[0];
     if (file) {
       const reader = new FileReader();
-      this.arquivoAcesso = file;
+      this.accessFile = file;
     }
   }
 
@@ -69,7 +69,7 @@ export class ParseFilesComponent implements OnInit{
     const file = input.files?.[0];
     if (file) {
       const reader = new FileReader();
-      this.arquivoLogEventos = file;
+      this.eventLogFile = file;
     }
   }
 
@@ -78,23 +78,23 @@ export class ParseFilesComponent implements OnInit{
     const file = input.files?.[0];
     if (file) {
       const reader = new FileReader();
-      this.arquivoLogAcesso = file;
+      this.accessLogFile = file;
     }
   }
 
   startAlgorithm() {
     const formData = new FormData();
-    if (this.arquivoDeclare != null && this.arquivoOrganizacional != null && this.arquivoAcesso != null && this.arquivoLogEventos != null && this.arquivoLogAcesso != null) {
+    if (this.declareFile != null && this.organizationalFile != null && this.accessFile != null && this.eventLogFile != null && this.accessLogFile != null) {
       this.loading = true;
-      formData.append('declare', this.arquivoDeclare!); 
-      formData.append('organizational', this.arquivoOrganizacional!); 
-      formData.append('access', this.arquivoAcesso!); 
-      formData.append('accessLog', this.arquivoLogAcesso!); 
-      formData.append('eventLog', this.arquivoLogEventos!); 
+      formData.append('declare', this.declareFile!); 
+      formData.append('organizational', this.organizationalFile!); 
+      formData.append('access', this.accessFile!); 
+      formData.append('accessLog', this.accessLogFile!); 
+      formData.append('eventLog', this.eventLogFile!); 
 
-      this.service.processarArquivos(formData).subscribe({
-        next: (resultado: ApiResponse) => {
-          this.service.setResultado(resultado.data);
+      this.service.processFiles(formData).subscribe({
+        next: (result: ApiResponse) => {
+          this.service.setResult(result.data);
           this.router.navigate(['/report']);
         },
         error: (err: any) => {

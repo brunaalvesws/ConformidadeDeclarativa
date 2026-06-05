@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable'
 import { ReportDTO } from "../models/report.dto";
-import { ProcessamentoService } from '../services/processamento.service';
+import { ServiceProcessing } from '../services/processamento.service';
 
 export const NON_CONFORMANCE_CATEGORY_DESCRIPTIONS: Record<string, string> = {
 
@@ -42,23 +42,23 @@ export const NON_CONFORMANCE_CATEGORY_DESCRIPTIONS: Record<string, string> = {
 })
 export class ReportComponent implements OnInit {
 
-  resultado: ReportDTO | null = null; 
-  dataGeracao: Date = new Date(); 
+  result: ReportDTO | null = null; 
+  generationDate: Date = new Date(); 
 
-  constructor(private service: ProcessamentoService) {}
+  constructor(private service: ServiceProcessing) {}
 
   ngOnInit() {
-    this.resultado = this.service.getResultado();
+    this.result = this.service.getResult();
   }
 
   onExportCSV(): void {
-    if (!this.resultado) return;
+    if (!this.result) return;
 
     const rows: string[] = [];
     rows.push("Activity,Resource,Data Object,Operation,Category,Instances");
 
-    for (const category in this.resultado.violations) {
-      const violations = this.resultado.violations[category];
+    for (const category in this.result.violations) {
+      const violations = this.result.violations[category];
 
       const isDataAccess = category.toLowerCase().includes("data access");
 
@@ -110,10 +110,112 @@ export class ReportComponent implements OnInit {
     link.click();
   }
 
-    onRegenerate(): void {
-      alert('Botão de Regenerar foi clicado')
-      console.log('Função Regenerar acionada');
+  onExportPDF(): void {
+    if (!this.result?.violations) return;
+
+    const doc = new jsPDF();
+    let y = 15; 
+    const marginX = 12; 
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const totalViolations = this.result.overview.violationCount; 
+    const categoryCounts: { [key: string]: number } = {};
+
+    for (const category in this.result.violations) {
+      categoryCounts[category] = this.result.violations[category].length;
     }
+
+    const styles = {
+      title: () => {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+      },
+      textBold: (size: number) => {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(size);
+        doc.setTextColor(0, 0, 0);
+      },
+      textNormal: (size: number) => {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(size);
+        doc.setTextColor(0, 0, 0);
+      },
+      drawLine: (yPos: number) => {
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.1);
+        doc.line(marginX, yPos, pageWidth - marginX, yPos);
+      }
+    };
+
+    styles.title();
+    doc.text("Conformance Checking Results", marginX, y);
+
+    const successRate = this.result.overview.successRate;
+    styles.textBold(10);
+    doc.text(`${successRate.toFixed(2)}% Success`, pageWidth - marginX, y, { align: "right" });
+    
+    y += 5;
+    styles.textNormal(9);
+    doc.text(`Total Violations: ${totalViolations}`, pageWidth - marginX, y, { align: "right" });
+    
+    y += 3;
+    styles.drawLine(y); 
+    y += 8;
+  
+    for (const category in this.result.violations) {
+      if (y > pageHeight - 15) { doc.addPage(); y = 15; }
+
+      const count = categoryCounts[category];
+      const percent = totalViolations > 0 ? ((count / totalViolations) * 100).toFixed(2) : "0.00";
+
+      styles.textBold(10);
+      doc.text(`${category.toUpperCase()} - ${percent}% (${count} errors)`, marginX, y);
+      y += 2;
+      styles.drawLine(y); 
+      y += 6;
+
+      for (const v of this.result.violations[category]) {
+        if (y > pageHeight - 15) { doc.addPage(); y = 15; }
+
+        const catLower = category.toLowerCase();
+        let highlightText = "";
+        let descriptionText = "";
+
+        if (catLower.includes('mandatory activity') || catLower.includes('prohibited activity')) {
+          highlightText = `Constraint Violated: ${v.rule}`;
+          descriptionText = v.instance !== '' 
+            ? `In trace number ${v.case_id}, this rule was violated on instance number ${v.instance}.`
+            : `In trace number ${v.case_id}, this rule was violated because an expected activity was not found in the log.`;
+        } else if (catLower.includes('unexpected activity') || catLower.includes('illegal activity')) {
+          highlightText = `Activity: ${v.activity}`;
+          descriptionText = `In trace number ${v.case_id}, this activity was done by the resource ${v.resource} on instance ${v.instance}.`;
+        } else if (catLower.includes('data')) {
+          highlightText = `Data access: ${v.operation} on ${v.tool} in the activity ${v.activity}`;
+          descriptionText = `In trace number ${v.case_id}, this data access was performed on instance ${v.instance}.`;
+        } else {
+          highlightText = `Violation in trace ${v.case_id}`;
+          descriptionText = "";
+        }
+
+      
+        styles.textBold(8);
+        doc.text(highlightText, marginX + 2, y);
+        y += 4;
+
+        styles.textNormal(8);
+        const maxWidth = pageWidth - marginX - 10;
+        const descriptionLines = doc.splitTextToSize(descriptionText, maxWidth);
+        
+        doc.text(descriptionLines, marginX + 4, y);
+        y += (descriptionLines.length * 3.5) + 2; 
+      }
+      y += 3;
+    }
+
+    doc.save("Conformance_Report.pdf");
+  }
 
     getDescription(category: string): string {
       return NON_CONFORMANCE_CATEGORY_DESCRIPTIONS[category] 

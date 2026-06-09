@@ -22,7 +22,7 @@ Por configuração o frontend roda na porta 4200
 
 
 
-Link para acessar a ferramenta: \[https://conformidade-declarativa.vercel.app/](https://conformidade-declarativa.vercel.app/)
+Link para acessar a ferramenta: [https://conformidade-declarativa.vercel.app/](https://mp-conformance-checking.vercel.app/)
 
 
 

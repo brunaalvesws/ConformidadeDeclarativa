@@ -29,7 +29,7 @@ def check_access_conformance(process_model, log):
     size = sum(len(trace) for trace in event_log.get_log())
     return violations, size
 
-def check_resource_activities_conformance(process_log, access_log, allowed_activities_set, resource_model, access_violations):
+def check_resource_activities_conformance(process_log_df, access_log, allowed_activities_set, resource_model, access_violations):
     '''
     Checks conformance between the access log, process log, and the resource model.
     
@@ -38,7 +38,6 @@ def check_resource_activities_conformance(process_log, access_log, allowed_activ
     Accepts a process log (EventLog object), access log (DataFrame), access violations (DataFrame), set of allowed activities and a Resource Model (DataFrame).
     '''
 
-    process_log_df = pm4py.convert_to_dataframe(process_log.get_log())
     process_log_df = process_log_df.sort_values(['case:concept:name', 'concept:instance'])
     processed_process_log = process_log_df[process_log_df["lifecycle:transition"] == "begin"]
 

@@ -38,7 +38,9 @@ def check_resource_activities_conformance(process_log, access_log, allowed_activ
     Accepts a process log (EventLog object), access log (DataFrame), access violations (DataFrame), set of allowed activities and a Resource Model (DataFrame).
     '''
 
-    processed_process_log = process_log[process_log["lifecycle:transition"] == "begin"]
+    process_log_df = pm4py.convert_to_dataframe(process_log.get_log())
+    process_log_df = process_log_df.sort_values(['case:concept:name', 'concept:instance'])
+    processed_process_log = process_log_df[process_log_df["lifecycle:transition"] == "begin"]
 
     violations = {}
     violations["IllegalTeamAccess"] = []
@@ -51,7 +53,7 @@ def check_resource_activities_conformance(process_log, access_log, allowed_activ
     prohibited_access = access_violations['Prohibited']
     optional_access = access_violations['Resource']
     
-    optional_data = [(item [0], parse_constraint(item[1])) for item in optional_access]
+    optional_data = [(item[0], parse_constraint(item[1])) for item in optional_access]
 
     for _, row in resource_model.iterrows():
         case_name = row['case:concept:name']
@@ -65,17 +67,17 @@ def check_resource_activities_conformance(process_log, access_log, allowed_activ
             activity_name = activity['concept:name']
             
             if activity_resource not in resources:
-                violations["IllegalTeamActivity"].append([activity_name, activity['@@case_index'], activity_resource, activity['concept:instance']])
+                violations["IllegalTeamActivity"].append([activity_name, activity['@@case_index'], activity_resource, str(activity['concept:instance'])])
                 
             if activity_name not in allowed_activities_set:
                 unexpected = True
-                activity_conformance['UnexpectedActivity'].append([activity_name, activity['@@case_index'], activity['concept:instance'], activity_resource])
+                activity_conformance['UnexpectedActivity'].append([activity_name, activity['@@case_index'], str(activity['concept:instance']), activity_resource])
                 
             instance_in_mandatory = [item for item in mandatory_access if activity['concept:instance'] in item[2] and item[0] == activity['@@case_index']]
             activity_access = accesses[accesses['concept:instance']== activity['concept:instance']]
             for _, acc in activity_access.iterrows():
                 if unexpected:
-                    activity_conformance['UnexpectedDataAccess'].append([acc['concept:name'], acc['concept:operation'], activity['@@case_index'], acc['concept:instance'], acc['concept:resource'], activity_name])
+                    activity_conformance['UnexpectedDataAccess'].append([acc['concept:name'], acc['concept:operation'], activity['@@case_index'], str(acc['concept:instance']), acc['concept:resource'], activity_name])
 
                 verified_violations = []
                 for violation in instance_in_mandatory:
@@ -91,7 +93,7 @@ def check_resource_activities_conformance(process_log, access_log, allowed_activ
                             access_violations['Mandatory'].remove(violation)
                 instance_in_mandatory = [i for i in instance_in_mandatory if instance_in_mandatory.index(i) not in verified_violations]
                             
-                instance_in_prohibited = [item for item in prohibited_access if item[0] == activity['@@case_index'] and activity['concept:instance'] in item[2] and 'Precedence' in item[1] and acc['concept:name'] in parse_constraint(item[1])[1] and acc['concept:operation'].lower() in parse_constraint(item[1])[2]]
+                instance_in_prohibited = [item for item in prohibited_access if activity['concept:instance'] in item[2] and item[0] == activity['@@case_index'] and 'Precedence' in item[1] and acc['concept:name'] in parse_constraint(item[1])[1] and acc['concept:operation'].lower() in parse_constraint(item[1])[2]]
                 
                 for violation in instance_in_prohibited:
                     if acc['concept:resource'] != activity_resource:

@@ -100,6 +100,7 @@ export class ParseFilesComponent implements OnInit{
         },
         error: (err: HttpErrorResponse) => {
           alert(err.error?.message || 'Unexpected Error');
+          this.loading = false;
         }
       });
     } else {

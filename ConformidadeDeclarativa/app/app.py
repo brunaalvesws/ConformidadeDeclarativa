@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from app.initialize_functions import initialize_route
 from flask_cors import CORS
 import logging
@@ -15,6 +15,14 @@ def create_app(env: str = "development") -> Flask:
         ENV=env,
         PROPAGATE_EXCEPTIONS=is_dev
     )
+    
+    @app.errorhandler(Exception)
+    def handle_exception(error):
+        app.logger.exception(error)
+
+        return jsonify({
+            "message": error.message
+        }), 500
 
     # =========================
     # LOGGING (Docker-friendly)

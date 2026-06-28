@@ -4,6 +4,7 @@ import { FormsModule, NgModel } from '@angular/forms';
 import { ServiceProcessing } from '../services/processamento.service';
 import { Router } from '@angular/router';
 import { ReportDTO } from '../models/report.dto';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface ApiResponse {
   data: ReportDTO;
@@ -97,7 +98,7 @@ export class ParseFilesComponent implements OnInit{
           this.service.setResult(result.data);
           this.router.navigate(['/report']);
         },
-        error: (err: any) => {
+        error: (err: HttpErrorResponse) => {
           alert(err.error?.message || 'Unexpected Error');
         }
       });

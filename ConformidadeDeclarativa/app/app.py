@@ -3,6 +3,7 @@ from app.initialize_functions import initialize_route
 from flask_cors import CORS
 import logging
 import traceback
+from werkzeug.exceptions import HTTPException
 
 def create_app(env: str = "development") -> Flask:
     app = Flask(__name__)
@@ -18,6 +19,9 @@ def create_app(env: str = "development") -> Flask:
     
     @app.errorhandler(Exception)
     def handle_exception(error):
+        if isinstance(error, HTTPException):
+            return error
+
         app.logger.exception(error)
 
         return jsonify({

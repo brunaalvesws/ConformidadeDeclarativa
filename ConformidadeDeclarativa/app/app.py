@@ -21,7 +21,7 @@ def create_app(env: str = "development") -> Flask:
         app.logger.exception(error)
 
         return jsonify({
-            "message": error.message
+            "message": str(error)
         }), 500
 
     # =========================

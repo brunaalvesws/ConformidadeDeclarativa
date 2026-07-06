@@ -12,7 +12,7 @@ def MultiperspectiveConformanceAlgorithm(eventPATH=str(Path(__file__).resolve().
                                          resourcePATH=str(Path(__file__).resolve().parent / 'ModeloRecursosOFICIALv4.csv'),
                                          declarePATH=str(Path(__file__).resolve().parent / 'Modelo_Log_Sintetico_OFICIAL.decl'),
                                          accessmodelPATH=str(Path(__file__).resolve().parent / 'ModeloAcessoOFICIAL.csv'),
-                                         consider_vacuity=True):
+                                         consider_vacuity=False):
   '''
   The algorithm accepts: a process log, a data access log, a resource model, a process DECLARE model, and a data access model.
   '''

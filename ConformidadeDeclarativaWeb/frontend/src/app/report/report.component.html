@@ -15,7 +15,7 @@
       Multi-perspective Conformance Checking Report
     </h1>
     <p class="text-base text-gray-500">
-      Analysis of violations and inconformances identified
+      Analysis of the identified violations and inconformances 
     </p>
   </div>
 
@@ -71,7 +71,7 @@
                     Conformance Checking Execution Overview
                   </h3>
                   <p class="text-xs text-gray-500 mt-0.5">
-                    Global performance metrics across traces
+                    Global performance metrics
                   </p>
                 </div>
               </div>
@@ -148,7 +148,7 @@
                   <h3 class="text-sm font-bold text-gray-900">
                     Conformance Checking Results
                   </h3>
-                  <p class="text-xs text-gray-500 mt-0.5">Anomaly Patterns</p>
+                  <p class="text-xs text-gray-500 mt-0.5">Inconformances classification</p>
                 </div>
               </div>
               <span
@@ -231,31 +231,31 @@
                         </span>
                       </div>
                       <p *ngIf="(item.key.includes('mandatory activity') || item.key.includes('Prohibited activity')) && violation.instance != ''" class="text-xs text-gray-600 ml-5 leading-relaxed">
-                        In trace number {{ violation.case_id }}, this rule was violated on instance number {{ violation.instance }}. 
+                        In case number {{ violation.case_id }}, this rule was violated on instance number {{ violation.instance }}. 
                       </p>
                       <p *ngIf="(item.key.includes('mandatory activity') || item.key.includes('Prohibited activity')) && violation.instance === ''" class="text-xs text-gray-600 ml-5 leading-relaxed">
-                        In trace number {{ violation.case_id }}, this rule was violated because an expected activity was not found in the log. 
+                        In case number {{ violation.case_id }}, this rule was violated because an expected activity was not found in the log. 
                       </p>
                       <p *ngIf="item.key.includes('mandatory data')" class="text-xs text-gray-600 ml-5 leading-relaxed">
-                        In trace number {{ violation.case_id }}, there was a mandatory data access that was not done on instance number {{ violation.instance }}. 
+                        In case number {{ violation.case_id }}, there was a mandatory data access that was not done on instance number {{ violation.instance }}. 
                       </p>
                       <p *ngIf="item.key.includes('Prohibited data')" class="text-xs text-gray-600 ml-5 leading-relaxed">
-                        In trace number {{ violation.case_id }}, this data access was not allowed to be done on instance number {{ violation.instance }}. 
+                        In case number {{ violation.case_id }}, this data access was not allowed to be done on instance number {{ violation.instance }}. 
                       </p>
                       <p *ngIf="item.key.includes('Unexpected activity')" class="text-xs text-gray-600 ml-5 leading-relaxed">
-                        In trace number {{ violation.case_id }}, this activity was done by the resource {{ violation.resource }} on instance {{ violation.instance }}. 
+                        In case number {{ violation.case_id }}, this activity was done by the resource {{ violation.resource }} on instance {{ violation.instance }}. 
                       </p>
                       <p *ngIf="item.key.includes('Unexpected data')" class="text-xs text-gray-600 ml-5 leading-relaxed">
-                        In trace number {{ violation.case_id }}, this data access was done by the resource {{ violation.resource }} on instance {{ violation.instance }}. 
+                        In case number {{ violation.case_id }}, this data access was done by the resource {{ violation.resource }} on instance {{ violation.instance }}. 
                       </p>
                       <p *ngIf="item.key.includes('Illegal activity')" class="text-xs text-gray-600 ml-5 leading-relaxed">
-                        In trace number {{ violation.case_id }} on instance {{ violation.instance }}, this activity was done by the resource {{ violation.resource }}, but it is not part of the designated team. 
+                        In case number {{ violation.case_id }} on instance {{ violation.instance }}, this activity was done by the resource {{ violation.resource }}, but it is not part of the designated team. 
                       </p>
                       <p *ngIf="item.key.includes('Illegal data') && violation.designated_resource == null" class="text-xs text-gray-600 ml-5 leading-relaxed">
-                        In trace number {{ violation.case_id }} on instance {{ violation.instance }}, this data access was done by the resource {{ violation.resource }} but it is not part of the designated team. 
+                        In case number {{ violation.case_id }} on instance {{ violation.instance }}, this data access was done by the resource {{ violation.resource }} but it is not part of the designated team. 
                       </p>
                       <p *ngIf="item.key.includes('Illegal data') && violation.designated_resource != null" class="text-xs text-gray-600 ml-5 leading-relaxed">
-                        In trace number {{ violation.case_id }} on instance {{ violation.instance }}, this data access was done by the resource {{ violation.resource }} but it is not the designated one for the linked activity, {{ violation.designated_resource }} is. 
+                        In case number {{ violation.case_id }} on instance {{ violation.instance }}, this data access was done by the resource {{ violation.resource }} but it is not the designated one for the linked activity, {{ violation.designated_resource }} is. 
                       </p>
                     </div>
                   </div>
